@@ -49,6 +49,7 @@ const MostVotes = (props) => {
         no votes yet!
         </div>
     )
+
 }
 const anecdotes = [
     'If it hurts, do it more often',

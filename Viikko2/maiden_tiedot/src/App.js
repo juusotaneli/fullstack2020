@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import SearchForm from './Components/SearchForm'
-import Filter from './Components/Filter'
+import SearchForm from './components/SearchForm'
+import Filter from './components/Filter'
 
 const App = () => {
 
   const [countries, setCountries] = useState([])
   const [newSearch, setNewSearch] = useState('')
-
+  
   useEffect(() => {
     axios
       .get('https://restcountries.eu/rest/v2/all')
@@ -15,7 +15,7 @@ const App = () => {
   }, [])
 
   const handleSearchfieldChange = (event) => {
-    event.preventDefault(); 
+    event.preventDefault()
     setNewSearch(event.target.value)
   }
 

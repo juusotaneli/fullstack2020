@@ -10,9 +10,9 @@ const WeatherDisplay = (props) => {
     }
     useEffect(() => {
         axios
-            .get('http://api.weatherstack.com/current', { params })
+            .get('http://api.weatherstack.com/current', {params})
             .then(response => { setWeather(response.data) })
-    }, [])
+    },[params])
 
     console.log(weather)
 
@@ -31,7 +31,6 @@ const WeatherDisplay = (props) => {
     }
     return (
         <p>
-
             loading...
         </p>
     )

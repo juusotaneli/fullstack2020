@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
+import Notification from './components/Notification'
 import contactService from './services/contacts'
 
 
@@ -10,6 +11,8 @@ const App = () => {
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
     const [newSearch, setNewSearch] = useState('')
+    const [message, setMessage] = useState('')
+
 
     useEffect(() => {
         console.log('effect')
@@ -31,11 +34,27 @@ const App = () => {
 
                 contactService
                     .update(persons.find(person => person.name === newName).id, personObject)
+                    
                     .then(returnedPerson => {
                         setPersons(persons.map(person => person.name !== newName ? person : returnedPerson))
+                        setMessage(`${newName}'s phone number was updated!!`)
+                        setTimeout(() => {
+                            setMessage('')
+                        }, 5000)
+                    })  
+                    .catch(returnedPerson => {
+                        setPersons(persons.filter(person => person.name !== newName))
+                        setMessage(`contact '${newName}' has already been removed :(`)
+                        setNewName('')
+                        setNewNumber('')
+                        setTimeout(() => {
+                            setMessage('')
+                        }, 5000)
 
                     })
+                    
             }
+           
             setNewName('')
             setNewNumber('')
 
@@ -48,6 +67,10 @@ const App = () => {
                 .create(personObject)
                 .then(returnedContact => {
                     setPersons(persons.concat(returnedContact))
+                    setMessage(`new contact '${newName}' was added`)
+                    setTimeout(() => {
+                        setMessage('')
+                    }, 5000)
                     setNewName('')
                     setNewNumber('')
                 })
@@ -55,11 +78,20 @@ const App = () => {
     }
     const removePerson = (event) => {
         event.preventDefault()
-        let result = window.confirm(`are you sure you want to delete beloved '${persons.find(p => p.id === Number(event.target.value)).name}' from your contacts?`)
+        let name = persons.find(p => p.id === Number(event.target.value)).name
+        let result = window.confirm(`are you sure you want to delete beloved '${name}' from your contacts?`)
         if (result) {
             event.preventDefault()
             setPersons(persons.filter(p => p.id !== Number(event.target.value)))
             contactService.remove(event.target.value)
+                .catch(error => {
+                    setMessage(`contact '${name}' has already been removed :(`)
+                })
+            setMessage(`contact '${name}' was removed :(`)
+            setTimeout(() => {
+                setMessage('')
+            }, 5000)
+
         }
 
     }
@@ -75,6 +107,7 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification message={message} />
             <form >
                 filter by name: <input value={newSearch}
                     onChange={handleSearchfieldChange}

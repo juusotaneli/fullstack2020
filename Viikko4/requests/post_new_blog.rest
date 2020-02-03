@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blog/ 
+Content-Type: application/json
+
+{
+    "title": "Esana olemisen riemu",
+    "author": "Esa Esanen", 
+    "url": "www.esa.fi",
+    "likes": 0
+}

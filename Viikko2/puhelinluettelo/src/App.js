@@ -31,17 +31,15 @@ const App = () => {
                     name: newName,
                     number: newNumber
                 }
-
                 contactService
                     .update(persons.find(person => person.name === newName).id, personObject)
-                    
                     .then(returnedPerson => {
                         setPersons(persons.map(person => person.name !== newName ? person : returnedPerson))
                         setMessage(`${newName}'s phone number was updated!!`)
                         setTimeout(() => {
                             setMessage('')
                         }, 5000)
-                    })  
+                    })
                     .catch(returnedPerson => {
                         setPersons(persons.filter(person => person.name !== newName))
                         setMessage(`contact '${newName}' has already been removed :(`)
@@ -52,9 +50,9 @@ const App = () => {
                         }, 5000)
 
                     })
-                    
+
             }
-           
+
             setNewName('')
             setNewNumber('')
 
@@ -74,26 +72,35 @@ const App = () => {
                     setNewName('')
                     setNewNumber('')
                 })
+                .catch(error => {
+                    setMessage(error.response.data.error)
+                    setTimeout(() => {
+                        setMessage('')
+                    }, 5000)
+                    setNewName('')
+                    setNewNumber('')
+                }
+                )
         }
     }
     const removePerson = (event) => {
         event.preventDefault()
-        let name = persons.find(p => p.id === Number(event.target.value)).name
-        let result = window.confirm(`are you sure you want to delete beloved '${name}' from your contacts?`)
+        let person = persons.find(p => p.id === event.target.value)
+        let result = window.confirm(`are you sure you want to delete beloved '${person.name}' from your contacts?`)
         if (result) {
-            event.preventDefault()
-            setPersons(persons.filter(p => p.id !== Number(event.target.value)))
-            contactService.remove(event.target.value)
-                .catch(error => {
-                    setMessage(`contact '${name}' has already been removed :(`)
+            setPersons(persons.filter(p => p.id !== event.target.value))
+            contactService
+                .remove(event.target.value)
+                .then(r => {
+                    setMessage(`contact '${person.name}' was removed :(`)
+                    setTimeout(() => {
+                        setMessage('')
+                    }, 5000)
                 })
-            setMessage(`contact '${name}' was removed :(`)
-            setTimeout(() => {
-                setMessage('')
-            }, 5000)
-
+                .catch(error => {
+                    setMessage(`contact '${person.name}' has already been removed :(`)
+                })
         }
-
     }
     const handleNameChange = (event) => {
         setNewName(event.target.value)

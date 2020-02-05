@@ -19,7 +19,6 @@ test('dummy returns one', () => {
 })
 
 describe('total likes', () => {
-    
     test('when the list has only one blog', () => {
         const result = listHelper.totalLikes(listWithOneBlog)
         expect(result).toBe(5)
@@ -30,7 +29,6 @@ describe('total likes', () => {
     })
 
 })
-
 describe('favorite blog', () => {
     test('when the list has only one blog', () => {
         const result = listHelper.favoriteBlog(listWithOneBlog)
@@ -41,3 +39,5 @@ describe('favorite blog', () => {
         expect(result).toEqual(blogs[2])
     })
 })
+
+

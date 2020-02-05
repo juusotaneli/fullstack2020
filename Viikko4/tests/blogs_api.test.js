@@ -83,3 +83,33 @@ test('if the title is null or the url is null new blog is not added', async () =
   expect(b.length).toBe(2)
 
 })
+test('blogs can be deleted', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  console.log(blogsAtEnd)
+  expect(blogsAtEnd.length).toBe(helper.initialBlogs.length - 1)
+  const title = blogsAtEnd.map(r => r.title)
+  expect(title).not.toContain(blogToDelete.title)
+})
+test('blogs can be updated', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToUpdate = blogsAtStart[0]
+
+  blogToUpdate.likes = 57
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(blogToUpdate)
+    .expect(204)
+  
+  const blogsInTheEnd = await helper.blogsInDb()
+
+  expect(blogsInTheEnd[0].likes).toBe(57)
+
+})

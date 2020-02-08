@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs/ 
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imp1dXNvIiwiaWQiOiI1ZTNmMThiMjNlNjQyOGUxM2M1YjQ3ZDQiLCJpYXQiOjE1ODExOTc2MTN9.krxugubhlAC2TrzQ5dASqX9LST3I658NPaRjYhHezVU
 
 {
-    "title": "Esana olemisen riemu",
-    "author": "Esa Esanen", 
-    "url": "www.esa.fi",
-    "likes": 0
+    "title": "Keijon elämä & teot",
+    "author": "Simo Simola", 
+    "url": "www.kustannus.fi",
+    "likes": 1
 }

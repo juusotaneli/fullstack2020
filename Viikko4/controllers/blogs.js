@@ -4,18 +4,13 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
 
-const getTokenFrom = request => {
-    const authorization = request.get('authorization')
-    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        return authorization.substring(7)
-    }
-    return null
-}
-
-
 blogsRouter.get('/api/blogs', async (request, response) => {
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
     response.json(blogs.map(b => b.toJSON()))
+})
+blogsRouter.get('/api/blogs/:id', async (request, response) => {
+    const blog = await Blog.findById(request.params.id)
+    response.json(blog.toJSON())
 })
 blogsRouter.get('/', (request, response, next) => {
     response.send('<h1>tervetullloo :DDD</h1>')
@@ -50,8 +45,23 @@ blogsRouter.post('/api/blogs', async (request, response) => {
     }
 })
 blogsRouter.delete('/api/blogs/:id', async (request, response) => {
-    await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
+    const token = request.token
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (!token || !decodedToken.id) {
+        return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    const blog = await Blog.findById(request.params.id)
+
+    console.log(decodedToken.id)
+    console.log(blog.user._id)
+
+    if (String(decodedToken.id) === String(blog.user._id)) {
+        await Blog.findByIdAndDelete(blog.id)
+        response.status(200).end()
+    } else {
+        return response.status(401).json({ error: 'tokens do not match' })
+    }
+
 })
 blogsRouter.put('/api/blogs/:id', async (request, response, next) => {
     const body = request.body

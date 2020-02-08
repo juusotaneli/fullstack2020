@@ -1,3 +1,4 @@
+require('express-async-errors')
 const config = require('./utils/config')
 const express = require('express')
 const app = express()
@@ -6,7 +7,7 @@ const blogsRouter = require('./controllers/blogs')
 const logger = require('./utils/logger')
 const middleware = require('./utils/middleware')
 const mongoose = require('mongoose')
-require('express-async-errors')
+const usersRouter = require('./controllers/users')
 
 logger.info('connecting to', config.MONGODB_URI)
 
@@ -22,6 +23,7 @@ app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
 app.use(middleware.requestLogger)
+app.use('/', usersRouter)
 
 app.use('/', blogsRouter)
 

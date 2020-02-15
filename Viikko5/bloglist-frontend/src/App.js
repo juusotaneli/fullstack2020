@@ -11,6 +11,13 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
 
+  const [blog, setBlog] = useState(null)
+  const [author, setAuthor] = useState('')
+  const [title, setTitle] = useState('')
+  const [url, setUrl] = useState('')
+
+
+
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs(blogs)
@@ -21,6 +28,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token) 
     }
   }, [])
   const handleLogin = async (event) => {
@@ -29,6 +37,7 @@ const App = () => {
       const user = await loginService.login({
         username, password,
       })
+      blogService.setToken(user.token)
       setUser(user)
       window.localStorage.setItem(
         'loggedInUser', JSON.stringify(user)
@@ -42,6 +51,61 @@ const App = () => {
       }, 5000)
     }
   }
+  const blogForm = () => (
+    <form onSubmit={handleNewBlog}>
+      <div>
+        title
+          <input
+          type="text"
+          value={title}
+          name="title"
+          onChange={({ target }) => setTitle(target.value)}
+        />
+      </div>
+      <div>
+        author
+          <input
+          type="text"
+          value={author}
+          name="author"
+          onChange={({ target }) => setAuthor(target.value)}
+        />
+      </div>
+      <div>
+        url
+          <input
+          type="text"
+          value={url}
+          name="url"
+          onChange={({ target }) => setUrl(target.value)}
+        />
+      </div>
+      <button type="submit">add new blog</button>
+    </form>
+
+  )
+  const handleNewBlog = async (event) => {
+    event.preventDefault()
+    try {
+      const b = await blogService.create({
+        title, author, url, 
+      })
+      setBlog(b) 
+      setBlogs(blogs.concat(b))
+      console.log(blog)
+      setAuthor('')
+      setTitle('')
+      setUrl('')
+    } catch (exception) {
+      console.log("tää" + blog)
+      setErrorMessage('something went wrong')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+
+  }
+
   const handleLogOut = () => {
     window.localStorage.removeItem('loggedInUser')
     window.location.reload(false);
@@ -84,7 +148,10 @@ const App = () => {
       <Notification message={errorMessage} />
       {user === null && loginForm()}
       {user !== null && showBlogs()}
+      {user !== null && blogForm()}
     </div>
   )
+  
 }
+
 export default App

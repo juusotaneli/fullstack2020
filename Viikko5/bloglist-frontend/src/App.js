@@ -9,14 +9,12 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [notification, setNotification] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
-
   const [blog, setBlog] = useState(null)
   const [author, setAuthor] = useState('')
   const [title, setTitle] = useState('')
   const [url, setUrl] = useState('')
-
-
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -45,7 +43,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('wrong credentials')
+      setErrorMessage('wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -96,6 +94,10 @@ const App = () => {
       setAuthor('')
       setTitle('')
       setUrl('')
+      setNotification(`a new blog ${b.title} by ${b.author} was added`)
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
     } catch (exception) {
       console.log("tää" + blog)
       setErrorMessage('something went wrong')
@@ -142,14 +144,21 @@ const App = () => {
     <p>logged in {user.username} <button onClick={handleLogOut}>log out</button></p>
   )
   return (
+    <>
     <div>
       <h2>Blogs</h2>
       {user !== null && showLoggedInUser()}
-      <Notification message={errorMessage} />
+      <Notification message={errorMessage} type="warning"/>
+      <Notification message={notification} type="success"/>
       {user === null && loginForm()}
-      {user !== null && showBlogs()}
-      {user !== null && blogForm()}
     </div>
+    <div>
+    <h2>Add new</h2>
+  
+      {user !== null && blogForm()}
+      {user !== null && showBlogs()}
+    </div>
+    </>
   )
   
 }

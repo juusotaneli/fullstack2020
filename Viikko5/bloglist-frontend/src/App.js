@@ -13,10 +13,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [blog, setBlog] = useState(null)
-  const [author, setAuthor] = useState('')
-  const [title, setTitle] = useState('')
-  const [url, setUrl] = useState('')
   const blogFormRef = React.createRef()
 
   useEffect(() => {
@@ -52,34 +48,27 @@ const App = () => {
       }, 5000)
     }
   }
-
-  const handleNewBlog = async (event) => {
-    event.preventDefault()
+  const addBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility()
     try {
-      const b = await blogService.create({
-        title, author, url,
+      let b = await blogService.create({
+        title: blogObject.title,
+        author: blogObject.author,
+        url: blogObject.url
       })
-      blogFormRef.current.toggleVisibility()
-      setBlog(b)
       setBlogs(blogs.concat(b))
-      console.log(blog)
-      setAuthor('')
-      setTitle('')
-      setUrl('')
       setNotification(`a new blog ${b.title} by ${b.author} was added`)
       setTimeout(() => {
         setNotification(null)
       }, 5000)
     } catch (exception) {
-      console.log("tää" + blog)
+      console.log(blogObject)
       setErrorMessage('something went wrong')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
     }
-
   }
-
   const handleLogOut = () => {
     window.localStorage.removeItem('loggedInUser')
     window.location.reload(false);
@@ -126,22 +115,15 @@ const App = () => {
       </div>
       <div>
         <h2>Add new</h2>
-        <Togglable buttonLabel="new blog" ref = {blogFormRef}>
-          {user !== null && <BlogForm
-            createNewBlog={handleNewBlog}
-            setTitle={setTitle}
-            setAuthor={setAuthor}
-            setUrl={setUrl}
-            title={title}
-            author={author}
-            url={url}
-          />}
+        <Togglable buttonLabel="new blog" ref={blogFormRef}>
+          {user !== null && <BlogForm createNewBlog={addBlog}/>}
         </Togglable>
         {user !== null && showBlogs()}
       </div>
 
     </>
   )
+
 
 }
 

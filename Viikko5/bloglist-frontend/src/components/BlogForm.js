@@ -1,22 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const BlogForm = ({
-    createNewBlog,
-    setTitle,
-    setAuthor,
-    setUrl,
-    title,
-    author,
-    url
-}) => {
+const BlogForm = React.forwardRef(({ createNewBlog }, ref) => {
+    const [author, setAuthor] = useState('')
+    const [title, setTitle] = useState('')
+    const [url, setUrl] = useState('')
+
+    const addBlog = (event) => {
+        event.preventDefault()
+        createNewBlog({
+            title: title,
+            author: author,
+            url: url,
+        })
+        console.log(title + ' ' + author)
+        setAuthor('')
+        setTitle('')
+        setUrl('')
+    }
     return (
-
         <div>
-
-            <form onSubmit={createNewBlog}>
+            <form onSubmit={addBlog}>
                 <div>
                     title
-          <input
+                    <input
                         type="text"
                         value={title}
                         name="title"
@@ -25,7 +31,7 @@ const BlogForm = ({
                 </div>
                 <div>
                     author
-          <input
+                    <input
                         type="text"
                         value={author}
                         name="author"
@@ -34,7 +40,7 @@ const BlogForm = ({
                 </div>
                 <div>
                     url
-          <input
+                    <input
                         type="text"
                         value={url}
                         name="url"
@@ -46,6 +52,7 @@ const BlogForm = ({
         </div>
 
     )
+})
 
-}
+
 export default BlogForm

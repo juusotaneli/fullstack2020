@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -15,6 +17,7 @@ const App = () => {
   const [author, setAuthor] = useState('')
   const [title, setTitle] = useState('')
   const [url, setUrl] = useState('')
+  const blogFormRef = React.createRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -26,7 +29,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      blogService.setToken(user.token) 
+      blogService.setToken(user.token)
     }
   }, [])
   const handleLogin = async (event) => {
@@ -49,46 +52,15 @@ const App = () => {
       }, 5000)
     }
   }
-  const blogForm = () => (
-    <form onSubmit={handleNewBlog}>
-      <div>
-        title
-          <input
-          type="text"
-          value={title}
-          name="title"
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </div>
-      <div>
-        author
-          <input
-          type="text"
-          value={author}
-          name="author"
-          onChange={({ target }) => setAuthor(target.value)}
-        />
-      </div>
-      <div>
-        url
-          <input
-          type="text"
-          value={url}
-          name="url"
-          onChange={({ target }) => setUrl(target.value)}
-        />
-      </div>
-      <button type="submit">add new blog</button>
-    </form>
 
-  )
   const handleNewBlog = async (event) => {
     event.preventDefault()
     try {
       const b = await blogService.create({
-        title, author, url, 
+        title, author, url,
       })
-      setBlog(b) 
+      blogFormRef.current.toggleVisibility()
+      setBlog(b)
       setBlogs(blogs.concat(b))
       console.log(blog)
       setAuthor('')
@@ -145,22 +117,32 @@ const App = () => {
   )
   return (
     <>
-    <div>
-      <h2>Blogs</h2>
-      {user !== null && showLoggedInUser()}
-      <Notification message={errorMessage} type="warning"/>
-      <Notification message={notification} type="success"/>
-      {user === null && loginForm()}
-    </div>
-    <div>
-    <h2>Add new</h2>
-  
-      {user !== null && blogForm()}
-      {user !== null && showBlogs()}
-    </div>
+      <div>
+        <h2>Blogs</h2>
+        {user !== null && showLoggedInUser()}
+        <Notification message={errorMessage} type="warning" />
+        <Notification message={notification} type="success" />
+        {user === null && loginForm()}
+      </div>
+      <div>
+        <h2>Add new</h2>
+        <Togglable buttonLabel="new blog" ref = {blogFormRef}>
+          {user !== null && <BlogForm
+            createNewBlog={handleNewBlog}
+            setTitle={setTitle}
+            setAuthor={setAuthor}
+            setUrl={setUrl}
+            title={title}
+            author={author}
+            url={url}
+          />}
+        </Togglable>
+        {user !== null && showBlogs()}
+      </div>
+
     </>
   )
-  
+
 }
 
 export default App

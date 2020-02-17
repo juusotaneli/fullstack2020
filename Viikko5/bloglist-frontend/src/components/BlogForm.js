@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const BlogForm = React.forwardRef(({ createNewBlog }, ref) => {
+const BlogForm = ({ createNewBlog }) => {
     const [author, setAuthor] = useState('')
     const [title, setTitle] = useState('')
     const [url, setUrl] = useState('')
@@ -12,7 +12,6 @@ const BlogForm = React.forwardRef(({ createNewBlog }, ref) => {
             author: author,
             url: url,
         })
-        console.log(title + ' ' + author)
         setAuthor('')
         setTitle('')
         setUrl('')
@@ -52,7 +51,7 @@ const BlogForm = React.forwardRef(({ createNewBlog }, ref) => {
         </div>
 
     )
-})
+}
 
 
 export default BlogForm

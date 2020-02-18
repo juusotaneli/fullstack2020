@@ -41,7 +41,7 @@ const App = () => {
       }, 5000)
     }
   }
-  
+
   const handleLogOut = () => {
     window.localStorage.removeItem('loggedInUser')
     window.location.reload(false);
@@ -69,8 +69,6 @@ const App = () => {
       <button type="submit">login</button>
     </form>
   )
-
-
   const showLoggedInUser = () => (
     <p>logged in {user.username} <button onClick={handleLogOut}>log out</button></p>
   )
@@ -83,14 +81,10 @@ const App = () => {
         {user === null && loginForm()}
       </div>
       <div>
-        <BlogDisplay user = {user} />
-        
+      {user !== null && <BlogDisplay user={user} />}
       </div>
-
     </>
   )
-
-
 }
 
 export default App

@@ -5,7 +5,6 @@ import loginService from './services/login'
 import Notification from './components/Notification'
 import BlogDisplay from './components/BlogDisplay'
 
-
 const App = () => {
 
   const [username, setUsername] = useState('')
@@ -44,13 +43,13 @@ const App = () => {
 
   const handleLogOut = () => {
     window.localStorage.removeItem('loggedInUser')
-    window.location.reload(false);
+    window.location.reload(false)
   }
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <div>
         username
-          <input
+        <input
           type="text"
           value={username}
           name="Username"
@@ -59,7 +58,7 @@ const App = () => {
       </div>
       <div>
         password
-          <input
+        <input
           type="password"
           value={password}
           name="Password"
@@ -69,6 +68,7 @@ const App = () => {
       <button type="submit">login</button>
     </form>
   )
+
   const showLoggedInUser = () => (
     <p>logged in {user.username} <button onClick={handleLogOut}>log out</button></p>
   )
@@ -81,7 +81,7 @@ const App = () => {
         {user === null && loginForm()}
       </div>
       <div>
-      {user !== null && <BlogDisplay user={user} />}
+        {user !== null && <BlogDisplay username={user.username} />}
       </div>
     </>
   )

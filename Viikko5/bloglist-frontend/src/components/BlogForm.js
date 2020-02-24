@@ -5,12 +5,12 @@ const BlogForm = ({ createNewBlog }) => {
   const [title, setTitle] = useState('')
   const [url, setUrl] = useState('')
 
-  const addBlog = (event) => {
+  const addBlog = event => {
     event.preventDefault()
     createNewBlog({
       title: title,
       author: author,
-      url: url,
+      url: url
     })
     setAuthor('')
     setTitle('')
@@ -18,40 +18,38 @@ const BlogForm = ({ createNewBlog }) => {
   }
   return (
     <div>
-      <form onSubmit={addBlog}>
-        <div>
-                    title
+      <form id='form' onSubmit={addBlog}>
+        <div >
+          title
           <input
-            type="text"
+            id='title'
+            type='text'
             value={title}
-            name="title"
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
         <div>
-                    author
+          author
           <input
-            type="text"
+            id='author'
+            type='text'
             value={author}
-            name="author"
             onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>
-                    url
+          url
           <input
-            type="text"
+            id='urlComponent'
+            type='text'
             value={url}
-            name="url"
             onChange={({ target }) => setUrl(target.value)}
           />
         </div>
-        <button type="submit">add</button>
+        <button type='submit'>add</button>
       </form>
     </div>
-
   )
 }
-
 
 export default BlogForm

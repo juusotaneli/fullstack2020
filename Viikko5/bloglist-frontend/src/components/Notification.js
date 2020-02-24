@@ -27,7 +27,7 @@ const Notification = ({ message, type }) => {
 
   if (type === 'warning') {
     return (
-      <div style={warning}>
+      <div style={warning} className = 'error'>
         {message}
       </div>
     )

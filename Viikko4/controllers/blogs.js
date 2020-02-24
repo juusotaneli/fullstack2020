@@ -35,7 +35,8 @@ blogsRouter.post('/api/blogs', async (request, response) => {
             author: body.author,
             url: body.url,
             likes: likes,
-            user: user._id
+            user: user._id,
+            visible: body.visible,
         })
         const savedBlog = await blog.save()
         user.blogs = user.blogs.concat(savedBlog._id)
@@ -63,15 +64,8 @@ blogsRouter.delete('/api/blogs/:id', async (request, response) => {
 
 })
 blogsRouter.put('/api/blogs/:id', async (request, response, next) => {
-    const body = request.body
-    const blog = {
-        title: body.title,
-        author: body.author,
-        url: body.url,
-        likes: body.likes,
-    }
-    console.log(blog)
-    await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    response.status(204).end()
+    const blog = request.body
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true }).populate('user', { username: 1, name: 1 })
+    response.json(updatedBlog.toJSON())
 })
 module.exports = blogsRouter

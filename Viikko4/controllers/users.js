@@ -19,8 +19,6 @@ usersRouter.post('/api/users', async (request, response) => {
 
     const savedUser = await user.save()
     response.json(savedUser)
-
-
   }
 
 })

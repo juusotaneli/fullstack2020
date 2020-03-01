@@ -8,10 +8,24 @@ const reducer = (state = notification, action) => {
       return action.notification
     case 'LIKE_NOTIFICATION':
       return action.notification
+    case 'SET_NOTIFICATION':
+      return action.notification
     default:
       return state
   }
 }
+export const newNotification = (text, time) => {
+  return async dispatch => {
+    dispatch({
+      type: 'SET_NOTIFICATION',
+      notification: text
+    })
+    setTimeout(() => {
+      dispatch(setNotificationToNull())
+    }, time)
+  }
+}
+
 export const setNotificationWhenNewAnecdoteAdded = content => {
   return {
     type: 'NEW_NOTIFICATION',

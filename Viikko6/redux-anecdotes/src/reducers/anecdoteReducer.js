@@ -43,10 +43,18 @@ const reducer = (state = [], action) => {
       return state
   }
 }
-export const voteAnecdote = id => {
-  return {
-    type: 'ADD_VOTE',
-    data: { id }
+export const voteAnecdote = anecdote => {
+  const changedAnectode = {
+    ...anecdote,
+    votes: anecdote.votes + 1
+  }
+  return async dispatch => {
+    const a = await anecdoteService.update(anecdote.id, changedAnectode)
+    console.log('TÄMÄ' + a.content)
+    dispatch({
+      type: 'ADD_VOTE',
+      data: a
+    })
   }
 }
 const generateId = () => Number((Math.random() * 1000000).toFixed(0))

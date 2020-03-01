@@ -18,7 +18,7 @@ const AnecdoteList = () => {
     return state.anecdotes
   })
   const likeAnecdote = anecdote => {
-    dispatch(voteAnecdote(anecdote.id))
+    dispatch(voteAnecdote(anecdote))
     dispatch(setNotificationWhenAnecdoteIsLiked(anecdote.content))
     setTimeout(() => {
       dispatch(setNotificationToNull())

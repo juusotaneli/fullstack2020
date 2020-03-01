@@ -5,7 +5,6 @@ import {
   setNotificationWhenNewAnecdoteAdded,
   setNotificationToNull
 } from '../reducers/notificationReducer'
-import anecdoteService from '../services/anecdotes'
 
 const AnecdoteForm = () => {
   const dispatch = useDispatch()
@@ -14,8 +13,7 @@ const AnecdoteForm = () => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
-    const newAnecdote = await anecdoteService.createNew(content)
-    dispatch(createNewAnecdote(newAnecdote))
+    dispatch(createNewAnecdote(content))
     dispatch(setNotificationWhenNewAnecdoteAdded(content))
     setTimeout(() => {
       dispatch(setNotificationToNull())

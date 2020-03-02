@@ -1,3 +1,8 @@
+
+import { useState} from 'react'
+
+let t;
+
 const notification = ''
 
 const reducer = (state = notification, action) => {
@@ -15,12 +20,16 @@ const reducer = (state = notification, action) => {
   }
 }
 export const newNotification = (text, time) => {
+  if (t) {
+    clearTimeout(t)
+  }
+
   return async dispatch => {
     dispatch({
       type: 'SET_NOTIFICATION',
       notification: text
     })
-    setTimeout(() => {
+    t = setTimeout(() => {
       dispatch(setNotificationToNull())
     }, time)
   }

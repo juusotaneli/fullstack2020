@@ -57,7 +57,7 @@ const Blog = ({ b, username }) => {
             {blog.title} {blog.author}{' '}
             <button onClick={() => handleToggleVisibility(blog)}>hide</button>
           </div>
-          <div id='url'>{blog.url} </div>
+          <div id='blogUrl'>{blog.url} </div>
           <div id='NumberOfLikes'>
             likes {blog.likes}{' '}
             <button id='likeButton' onClick={() => addLike(blog)}>

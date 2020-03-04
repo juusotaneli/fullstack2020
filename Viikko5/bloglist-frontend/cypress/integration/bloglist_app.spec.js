@@ -72,4 +72,5 @@ describe('when logged in', function () {
     cy.contains('deleted')
 
   })
+
 })

@@ -1,6 +1,14 @@
 import React, { useState } from 'react'
 
-import { BrowserRouter as Router, Switch, Route, Link, useParams } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useParams,
+  useHistory,
+  useRouteMatch
+} from 'react-router-dom'
 
 const Menu = () => {
   const padding = {
@@ -27,12 +35,24 @@ const Anecdote = ({ anecdotes }) => {
   return (
     <div>
       <h2>{a.content}</h2>
-      <div>has {a.votes} votes</div> <br/>
+      <div>has {a.votes} votes</div> <br />
       <div>
         for more info see <a href={a.info}>{a.info}</a>
-      </div><br/>
+      </div>
+      <br />
     </div>
   )
+}
+const Notification = ({ notification }) => {
+  const style = {
+    border: 'solid',
+    padding: 10,
+    borderWidth: 1
+  }
+  if (notification) {
+    return <div style={style}>{notification}</div>
+  }
+  return <></>
 }
 
 const AnecdoteList = ({ anecdotes }) => (
@@ -84,19 +104,21 @@ const Footer = () => (
   </div>
 )
 
-const CreateNew = props => {
+const CreateNew = ({ addNew }) => {
+  const history = useHistory()
   const [content, setContent] = useState('')
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
 
   const handleSubmit = e => {
     e.preventDefault()
-    props.addNew({
+    addNew({
       content,
       author,
       info,
       votes: 0
     })
+    history.push('/anecdotes')
   }
 
   return (
@@ -156,6 +178,10 @@ const App = () => {
   const addNew = anecdote => {
     anecdote.id = (Math.random() * 10000).toFixed(0)
     setAnecdotes(anecdotes.concat(anecdote))
+    setNotification('a new anecdote ' + anecdote.content + ' created!')
+    setTimeout(() => {
+      setNotification('')
+    }, 10000)
   }
 
   const anecdoteById = id => anecdotes.find(a => a.id === id)
@@ -176,6 +202,7 @@ const App = () => {
       <div>
         <h1>Software anecdotes</h1>
         <Menu />
+        <Notification notification={notification} />
         <Switch>
           <Route path='/anecdotes/:id'>
             <Anecdote anecdotes={anecdotes} />
@@ -184,7 +211,7 @@ const App = () => {
             <AnecdoteList anecdotes={anecdotes} />
           </Route>
           <Route path='/create'>
-            <CreateNew />
+            <CreateNew addNew={addNew} />
           </Route>
           <Route path='/about'>
             <About />

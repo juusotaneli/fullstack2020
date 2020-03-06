@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 
+import { useField } from './hooks'
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -31,7 +33,6 @@ const Menu = () => {
 const Anecdote = ({ anecdotes }) => {
   const id = useParams().id
   const a = anecdotes.find(a => Number(a.id) === Number(id))
-  console.log(anecdotes.find(a => a.id === Number(id)))
   return (
     <div>
       <h2>{a.content}</h2>
@@ -57,6 +58,7 @@ const Notification = ({ notification }) => {
 
 const AnecdoteList = ({ anecdotes }) => (
   <div>
+    {console.log(anecdotes)}
     <h2>Anecdotes</h2>
     <ul>
       {anecdotes.map(anecdote => (
@@ -106,9 +108,9 @@ const Footer = () => (
 
 const CreateNew = ({ addNew }) => {
   const history = useHistory()
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -127,27 +129,15 @@ const CreateNew = ({ addNew }) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input
-            name='content'
-            value={content}
-            onChange={e => setContent(e.target.value)}
-          />
+          <input {...content} />
         </div>
         <div>
           author
-          <input
-            name='author'
-            value={author}
-            onChange={e => setAuthor(e.target.value)}
-          />
+          <input {...author} />
         </div>
         <div>
           url for more info
-          <input
-            name='info'
-            value={info}
-            onChange={e => setInfo(e.target.value)}
-          />
+          <input {...info} />
         </div>
         <button>create</button>
       </form>
@@ -156,6 +146,8 @@ const CreateNew = ({ addNew }) => {
 }
 
 const App = () => {
+
+
   const [anecdotes, setAnecdotes] = useState([
     {
       content: 'If it hurts, do it more often',
@@ -175,10 +167,17 @@ const App = () => {
 
   const [notification, setNotification] = useState('')
 
-  const addNew = anecdote => {
-    anecdote.id = (Math.random() * 10000).toFixed(0)
-    setAnecdotes(anecdotes.concat(anecdote))
-    setNotification('a new anecdote ' + anecdote.content + ' created!')
+  const addNew = object => {
+    const newAnecdote = {
+      id: '',
+      content: object.content.value,
+      author: object.author.value,
+      info: object.info.value,
+      votes: object.votes
+    }
+    newAnecdote.id = (Math.random() * 10000).toFixed(0)
+    setAnecdotes(anecdotes.concat(newAnecdote))
+    setNotification('a new anecdote ' + newAnecdote.content + ' created!')
     setTimeout(() => {
       setNotification('')
     }, 10000)

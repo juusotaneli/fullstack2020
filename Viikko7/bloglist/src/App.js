@@ -8,6 +8,9 @@ import {
   setNotificationToNull,
   setNotificationWhenError
 } from './reducers/notificationReducer'
+import {
+  initializeBlogs,
+} from './reducers/blogReducer'
 
 const App = () => {
   let m = useSelector(state => state)
@@ -25,13 +28,11 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
   useEffect(() => {
-    const getData = async () => {
-      const blogs = await blogService.getAll()
-      setBlogs(blogs)
-    }
-    getData()
-  }, [])
+    blogService
+      .getAll().then(blogs => dispatch(initializeBlogs(blogs)))
+  }, [dispatch])
 
   const handleLogin = async event => {
     event.preventDefault()

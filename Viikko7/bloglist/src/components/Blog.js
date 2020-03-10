@@ -2,16 +2,20 @@ import React from 'react'
 import Togglable from './Togglable'
 import blogService from '../services/blogs'
 import BlogForm from './BlogForm'
+import { useDispatch, useSelector } from 'react-redux'
+
 import {
   setNotificationWhenNewBlogAdded,
-  setNotificationToNull,
   setNotificationWhenError,
   setNotificationWhenBlogDeleted
 } from '../reducers/notificationReducer'
-import { useDispatch } from 'react-redux'
+
+import { createNewBlog } from '../reducers/blogReducer'
 
 const Blog = ({ blogs, username, setBlogs }) => {
   const dispatch = useDispatch()
+  const b = useSelector(state => state.blogs)
+
   const blogFormRef = React.createRef()
 
   const blogStyle = {
@@ -23,7 +27,7 @@ const Blog = ({ blogs, username, setBlogs }) => {
   }
 
   const showBlogs = () => {
-    return blogs
+    return b
       .sort((b1, b2) => b2.likes - b1.likes)
       .map(b => contentVisibility(b))
   }
@@ -97,25 +101,16 @@ const Blog = ({ blogs, username, setBlogs }) => {
     console.log(username)
     blogFormRef.current.toggleVisibility()
     try {
-      let b = await blogService.create({
-        title: blogObject.title,
-        author: blogObject.author,
-        url: blogObject.url,
-        visible: false
-      })
-      setBlogs(blogs.concat(b))
+      dispatch(createNewBlog(blogObject))
       dispatch(
         setNotificationWhenNewBlogAdded(
-          `a new blog ${b.title} by ${b.author} was added`, 10000
+          `a new blog ${blogObject.title} by ${blogObject.author} was added`,
+          5000
         )
       )
     } catch (exception) {
-      console.log(blogObject)
-
-      dispatch(setNotificationWhenError('something went wrong'))
-      setTimeout(() => {
-        dispatch(setNotificationToNull())
-      }, 5000)
+      console.log(exception)
+      dispatch(setNotificationWhenError('something went wrong'), 5000)
     }
   }
   const deleteBlog = async blogObject => {
@@ -125,19 +120,14 @@ const Blog = ({ blogs, username, setBlogs }) => {
         await blogService.remove(blogObject.id)
         dispatch(
           setNotificationWhenBlogDeleted(
-            `a blog ${blogObject.title} by ${blogObject.author} was deleted`
+            `a blog ${blogObject.title} by ${blogObject.author} was deleted`,
+            5000
           )
         )
         setBlogs(blogs.filter(b => b.id !== blogObject.id))
-        setTimeout(() => {
-          dispatch(setNotificationToNull())
-        }, 5000)
       } catch (exception) {
         console.log(blogObject)
-        dispatch(setNotificationWhenError('something went wrong'))
-        setTimeout(() => {
-          dispatch(setNotificationToNull())
-        }, 5000)
+        dispatch(setNotificationWhenError('something went wrong', 5000))
       }
     }
   }

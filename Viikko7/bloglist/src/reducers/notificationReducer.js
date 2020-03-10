@@ -1,6 +1,6 @@
 let timeout
 
-const message = ''
+const message = null
 
 const reducer = (state = message, action) => {
   switch (action.type) {
@@ -16,37 +16,62 @@ const reducer = (state = message, action) => {
 }
 
 export const setNotificationWhenNewBlogAdded = (content, time) => {
-  return {
-    type: 'NEW_NOTIFICATION',
-    message: {
-      content: content,
-      style: 'success'
-    }
+  if (timeout) {
+    clearTimeout(timeout)
+  }
+  return dispatch => {
+    dispatch({
+      type: 'NEW_NOTIFICATION',
+      message: {
+        content: content,
+        style: 'success'
+      }
+    })
+    timeout = setTimeout(() => {
+      dispatch(setNotificationToNull())
+    }, time)
   }
 }
-export const setNotificationWhenBlogDeleted = content => {
-  return {
-    type: 'NEW_NOTIFICATION',
-    message: {
-      content: content,
-      style: 'warning'
-    }
+export const setNotificationWhenBlogDeleted = (content, time) => {
+  if (timeout) {
+    clearTimeout(timeout)
+  }
+  return async dispatch => {
+    dispatch({
+      type: 'NEW_NOTIFICATION',
+      message: {
+        content: content,
+        style: 'warning'
+      }
+    })
+    timeout = setTimeout(() => {
+      dispatch(setNotificationToNull())
+    }, time)
   }
 }
 
 export const setNotificationToNull = () => {
   return {
     type: 'REMOVE_NOTIFICATION',
-    message: null
+    message: null,
+    style: 'warning'
   }
 }
-export const setNotificationWhenError = content => {
-  return {
-    type: 'NEW_NOTIFICATION',
-    message: {
-      content: content,
-      style: 'warning'
-    }
+export const setNotificationWhenError = (content, time) => {
+  if (timeout) {
+    clearTimeout(timeout)
+  }
+  return async dispatch => {
+    dispatch({
+      type: 'NEW_NOTIFICATION',
+      message: {
+        content: content,
+        style: 'warning'
+      }
+    })
+    timeout = setTimeout(() => {
+      dispatch(setNotificationToNull())
+    }, time)
   }
 }
 

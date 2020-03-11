@@ -8,42 +8,38 @@ import {
   setNotificationToNull,
   setNotificationWhenError
 } from './reducers/notificationReducer'
-import {
-  initializeBlogs,
-} from './reducers/blogReducer'
+import { initializeBlogs } from './reducers/blogReducer'
+import { initializeUser, logoutUser } from './reducers/userReducer'
 
 const App = () => {
-  let m = useSelector(state => state)
   const dispatch = useDispatch()
+  const user = useSelector(state => state.user)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+      const u = JSON.parse(loggedUserJSON)
+      dispatch(initializeUser(u))
     }
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
-    blogService
-      .getAll().then(blogs => dispatch(initializeBlogs(blogs)))
+    blogService.getAll().then(blogs => dispatch(initializeBlogs(blogs)))
   }, [dispatch])
 
   const handleLogin = async event => {
     event.preventDefault()
     try {
-      const user = await loginService.login({
+      const u = await loginService.login({
         username,
         password
       })
-      blogService.setToken(user.token)
-      setUser(user)
-      window.localStorage.setItem('loggedInUser', JSON.stringify(user))
+      blogService.setToken(u.token)
+      dispatch(initializeUser(u))
+      window.localStorage.setItem('loggedInUser', JSON.stringify(u))
       setUsername('')
       setPassword('')
     } catch (exception) {
@@ -55,6 +51,7 @@ const App = () => {
   }
 
   const handleLogOut = () => {
+    dispatch(logoutUser())
     window.localStorage.removeItem('loggedInUser')
     window.location.reload(false)
   }
@@ -96,7 +93,7 @@ const App = () => {
       <div>
         <h2>Blogs</h2>
         {user !== null && showLoggedInUser()}
-        {m && <Notification />}
+        <Notification />
         {user === null && loginForm()}
       </div>
       <div>

@@ -6,10 +6,15 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   setNotificationWhenNewBlogAdded,
-  setNotificationWhenError,
+  setNotificationWhenError
 } from '../reducers/notificationReducer'
 
-import { createNewBlog, addLikeToABlog, deleteABlog, handleToggleVisibility } from '../reducers/blogReducer'
+import {
+  createNewBlog,
+  addLikeToABlog,
+  deleteABlog,
+  handleToggleVisibility
+} from '../reducers/blogReducer'
 
 const Blog = ({ blogs, username }) => {
   const dispatch = useDispatch()
@@ -37,7 +42,9 @@ const Blog = ({ blogs, username }) => {
         <div key={blog.id} style={blogStyle}>
           <div id='titleAndAuthor'>
             {blog.title} {blog.author}{' '}
-            <button onClick={() => dispatch(handleToggleVisibility(blog))}>view</button>
+            <button onClick={() => dispatch(handleToggleVisibility(blog))}>
+              view
+            </button>
           </div>
         </div>
       )
@@ -46,20 +53,26 @@ const Blog = ({ blogs, username }) => {
         <div key={blog.id} style={blogStyle}>
           <div>
             {blog.title} {blog.author}{' '}
-            <button onClick={() => dispatch(handleToggleVisibility(blog))}>hide</button>
+            <button onClick={() => dispatch(handleToggleVisibility(blog))}>
+              hide
+            </button>
           </div>
           <div id='blogUrl'>{blog.url} </div>
           <div id='NumberOfLikes'>
             likes {blog.likes}{' '}
-            <button id='likeButton' onClick={() => dispatch(addLikeToABlog(blog))}>
+            <button
+              id='likeButton'
+              onClick={() => dispatch(addLikeToABlog(blog))}
+            >
               like
             </button>{' '}
           </div>
-          {console.log("THIS" + blog.user)}
           <div>added by {blog.user.username} </div>
           <div>
             {username === blog.user.username && (
-              <button onClick={() => dispatch(deleteABlog(blog))}>delete</button>
+              <button onClick={() => dispatch(deleteABlog(blog))}>
+                delete
+              </button>
             )}{' '}
             <br />
           </div>

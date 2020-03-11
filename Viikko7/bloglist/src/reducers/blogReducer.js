@@ -7,7 +7,7 @@ import {
 const reducer = (state = [], action) => {
   console.log('state now: ', state)
   console.log('action', action)
-  let id = 'action.data.id'
+  let id = ''
   let blogToChange = ''
   let changedBlog = ''
   if (action.data) {
@@ -18,7 +18,6 @@ const reducer = (state = [], action) => {
 
   switch (action.type) {
   case 'NEW_BLOG':
-    console.log('TÄÄÄ' + action.data)
     return [...state, action.data]
   case 'DELETE_BLOG':
     return state.filter(b => b.id !== action.data.id)
@@ -55,7 +54,6 @@ export const addLikeToABlog = blog => {
       },
       blog.id
     )
-    console.log('TÄMÄ' + b.content)
     dispatch({
       type: 'ADD_LIKE',
       data: b
@@ -103,9 +101,16 @@ export const deleteABlog = b => {
           )
         )
       } catch (exception) {
-        console.log(b)
         dispatch(setNotificationWhenError('something went wrong', 5000))
       }
+    }
+  } else {
+    return async dispatch => {
+      const blogs = await blogService.getAll()
+      dispatch({
+        type: 'INIT_BLOGS',
+        data: blogs
+      })
     }
   }
 }
@@ -123,7 +128,6 @@ export const handleToggleVisibility = b => {
       },
       b.id
     )
-    console.log('TÄMÄ' + b.content)
     dispatch({
       type: 'CHANGE_VISIBILITY',
       data: blog

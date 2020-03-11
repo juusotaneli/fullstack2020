@@ -7,12 +7,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   setNotificationWhenNewBlogAdded,
   setNotificationWhenError,
-  setNotificationWhenBlogDeleted
 } from '../reducers/notificationReducer'
 
-import { createNewBlog } from '../reducers/blogReducer'
+import { createNewBlog, addLikeToABlog, deleteABlog, handleToggleVisibility } from '../reducers/blogReducer'
 
-const Blog = ({ blogs, username, setBlogs }) => {
+const Blog = ({ blogs, username }) => {
   const dispatch = useDispatch()
   const b = useSelector(state => state.blogs)
 
@@ -31,20 +30,6 @@ const Blog = ({ blogs, username, setBlogs }) => {
       .sort((b1, b2) => b2.likes - b1.likes)
       .map(b => contentVisibility(b))
   }
-  const addLike = async blog => {
-    let returnedBlog = await blogService.update(
-      {
-        user: blog.user.id,
-        title: blog.title,
-        author: blog.author,
-        url: blog.url,
-        likes: blog.likes + 1,
-        visible: blog.visible
-      },
-      blog.id
-    )
-    setBlogs(blogs.map(b => (b.id !== blog.id ? b : returnedBlog)))
-  }
 
   const contentVisibility = blog => {
     if (blog.visible === false) {
@@ -52,7 +37,7 @@ const Blog = ({ blogs, username, setBlogs }) => {
         <div key={blog.id} style={blogStyle}>
           <div id='titleAndAuthor'>
             {blog.title} {blog.author}{' '}
-            <button onClick={() => handleToggleVisibility(blog)}>view</button>
+            <button onClick={() => dispatch(handleToggleVisibility(blog))}>view</button>
           </div>
         </div>
       )
@@ -61,20 +46,20 @@ const Blog = ({ blogs, username, setBlogs }) => {
         <div key={blog.id} style={blogStyle}>
           <div>
             {blog.title} {blog.author}{' '}
-            <button onClick={() => handleToggleVisibility(blog)}>hide</button>
+            <button onClick={() => dispatch(handleToggleVisibility(blog))}>hide</button>
           </div>
           <div id='blogUrl'>{blog.url} </div>
           <div id='NumberOfLikes'>
             likes {blog.likes}{' '}
-            <button id='likeButton' onClick={() => addLike(blog)}>
+            <button id='likeButton' onClick={() => dispatch(addLikeToABlog(blog))}>
               like
             </button>{' '}
           </div>
-
+          {console.log("THIS" + blog.user)}
           <div>added by {blog.user.username} </div>
           <div>
             {username === blog.user.username && (
-              <button onClick={() => deleteBlog(blog)}>delete</button>
+              <button onClick={() => dispatch(deleteABlog(blog))}>delete</button>
             )}{' '}
             <br />
           </div>
@@ -82,21 +67,7 @@ const Blog = ({ blogs, username, setBlogs }) => {
       )
     }
   }
-  const handleToggleVisibility = async blog => {
-    console.log(blog)
-    let returnedBlog = await blogService.update(
-      {
-        user: blog.user.id,
-        title: blog.title,
-        author: blog.author,
-        url: blog.url,
-        likes: blog.likes,
-        visible: !blog.visible
-      },
-      blog.id
-    )
-    setBlogs(blogs.map(b => (b.id !== blog.id ? b : returnedBlog)))
-  }
+
   const addBlog = async blogObject => {
     console.log(username)
     blogFormRef.current.toggleVisibility()
@@ -111,24 +82,6 @@ const Blog = ({ blogs, username, setBlogs }) => {
     } catch (exception) {
       console.log(exception)
       dispatch(setNotificationWhenError('something went wrong'), 5000)
-    }
-  }
-  const deleteBlog = async blogObject => {
-    let result = window.confirm('Are you sure you want to delete this blog?')
-    if (result) {
-      try {
-        await blogService.remove(blogObject.id)
-        dispatch(
-          setNotificationWhenBlogDeleted(
-            `a blog ${blogObject.title} by ${blogObject.author} was deleted`,
-            5000
-          )
-        )
-        setBlogs(blogs.filter(b => b.id !== blogObject.id))
-      } catch (exception) {
-        console.log(blogObject)
-        dispatch(setNotificationWhenError('something went wrong', 5000))
-      }
     }
   }
   const showBlogForm = () => {

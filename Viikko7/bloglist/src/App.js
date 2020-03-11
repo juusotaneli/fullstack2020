@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import userService from './services/users'
 import Notification from './components/Notification'
 import Blog from './components/Blog'
+import User from './components/User'
+import Users from './components/Users'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   setNotificationToNull,
@@ -10,13 +13,14 @@ import {
 } from './reducers/notificationReducer'
 import { initializeBlogs } from './reducers/blogReducer'
 import { initializeUser, logoutUser } from './reducers/userReducer'
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 
 const App = () => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [blogs, setBlogs] = useState([])
+  const [users, setUsers] = useState('')
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInUser')
@@ -29,6 +33,18 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs => dispatch(initializeBlogs(blogs)))
   }, [dispatch])
+
+  useEffect(() => {
+    const u = async () => {
+      try {
+        const res = await userService.getAll()
+        setUsers(res)
+      } catch (error) {
+        console.log('error')
+      }
+    }
+    u()
+  }, [users])
 
   const handleLogin = async event => {
     event.preventDefault()
@@ -89,19 +105,30 @@ const App = () => {
     </p>
   )
   return (
-    <>
+    <Router>
+      <h2>Blogs</h2>
       <div>
-        <h2>Blogs</h2>
+        <Link to='/'>home</Link>
+        <Link to='/blogs'>blogs</Link>
+        <Link to='/users'>users</Link>
+      </div>
+
+      <div>
         {user !== null && showLoggedInUser()}
         <Notification />
         {user === null && loginForm()}
       </div>
-      <div>
-        {user !== null && (
-          <Blog username={user.username} blogs={blogs} setBlogs={setBlogs} />
-        )}
-      </div>
-    </>
+      <Switch>
+        <Route path='/blogs'>{user !== null && <Blog />}</Route>
+        <Route path='/users/:id'>
+          {users.length > 0 && <User users={users}/>}
+        </Route>
+        <Route path='/users'>{users !== null && users.length > 0 && <Users users={users} />}</Route>
+        <Route path='/'>
+          {user !== null && <p>HELLO WELCOME MY FRIEND</p>}
+        </Route>
+      </Switch>
+    </Router>
   )
 }
 

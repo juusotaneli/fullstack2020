@@ -1,6 +1,5 @@
 import React from 'react'
 import Togglable from './Togglable'
-import blogService from '../services/blogs'
 import BlogForm from './BlogForm'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -16,9 +15,10 @@ import {
   handleToggleVisibility
 } from '../reducers/blogReducer'
 
-const Blog = ({ blogs, username }) => {
+const Blog = () => {
   const dispatch = useDispatch()
-  const b = useSelector(state => state.blogs)
+  const blogs = useSelector(state => state.blogs)
+  const username = useSelector(state => state.user.username)
 
   const blogFormRef = React.createRef()
 
@@ -31,7 +31,7 @@ const Blog = ({ blogs, username }) => {
   }
 
   const showBlogs = () => {
-    return b
+    return blogs
       .sort((b1, b2) => b2.likes - b1.likes)
       .map(b => contentVisibility(b))
   }

@@ -20,7 +20,6 @@ const reducer = (state = [], action) => {
   case 'NEW_BLOG':
     return [...state, action.data]
   case 'DELETE_BLOG':
-    console.log(action.data.id)
     return state.filter(b => b.id !== action.data.id)
   case 'INIT_BLOGS':
     return action.data

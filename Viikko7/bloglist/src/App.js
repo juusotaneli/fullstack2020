@@ -33,7 +33,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(initializeUsers())
-  }, [dispatch])
+  }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInUser')

@@ -22,6 +22,12 @@ usersRouter.post('/api/users', async (request, response) => {
   }
 
 })
+usersRouter.put('/api/users/:id', async (request, response, next) => {
+  const user = request.body
+  const updatedUser = await User.findByIdAndUpdate(request.params.id, user, { new: true }).populate('blog', { author: 1, title: 1 })
+  response.json(updatedUser.toJSON())
+})
+
 usersRouter.get('/api/users', async (request, response) => {
   const users = await User.find({}).populate('blogs', { url: 1, title: 1, author: 1, id: 1})
 

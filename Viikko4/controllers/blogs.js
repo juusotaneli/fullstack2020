@@ -39,6 +39,7 @@ blogsRouter.post('/api/blogs', async (request, response) => {
             visible: body.visible,
         })
         const savedBlog = await blog.save()
+        user.blogs = user.blogs.concat(savedBlog._id)
         await user.save()
         response.json(savedBlog.toJSON())
     }
@@ -50,12 +51,16 @@ blogsRouter.delete('/api/blogs/:id', async (request, response) => {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
     const blog = await Blog.findById(request.params.id)
+    const user = await User.findById(decodedToken.id)
+
 
     console.log(decodedToken.id)
     console.log(blog.user._id)
 
     if (String(decodedToken.id) === String(blog.user._id)) {
         await Blog.findByIdAndDelete(blog.id)
+        user.blogs = user.blogs.filter(b => b.id.toString() !== request.params.id.toString())
+        await user.save()
         response.status(200).end()
     } else {
         return response.status(401).json({ error: 'tokens do not match' })

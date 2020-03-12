@@ -14,7 +14,7 @@ const reducer = (state = [], action) => {
     return action.users.map(u => (u.id !== id ? u : userToChange))
   case 'DEL_BLOG':
     userToChange = action.users.find(u => u.username === action.user.username)
-    userToChange.blogs = userToChange.blogs.filter(b => b.id === action.blog.id)
+    userToChange.blogs = userToChange.blogs.filter(b => b.id !== action.blog.id)
     return action.users.map(u => (u.username !== action.user.username ? u : userToChange))
   default:
     return state
@@ -41,7 +41,7 @@ export const addBlogToAUser = (user, blog, users) => {
 }
 export const delBlogFromAUser = (user, blog, users) => {
   return async dispatch => {
-    dispatch({
+    await dispatch({
       type: 'DEL_BLOG',
       users: users,
       user: user,

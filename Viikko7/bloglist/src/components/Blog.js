@@ -14,10 +14,9 @@ import {
   deleteABlog,
   handleToggleVisibility
 } from '../reducers/blogReducer'
-
 import {
   addBlogToAUser,
-  delBlogFromAUser
+  delBlogFromAUser,
 } from '../reducers/usersReducer'
 
 const Blog = () => {
@@ -77,7 +76,7 @@ const Blog = () => {
           <div>added by {blog.user.username} </div>
           <div>
             {username === blog.user.username && (
-              <button onClick={() => dispatch(deleteABlog(blog)) && dispatch(delBlogFromAUser(user, blog, users)) }>
+              <button onClick={() => del(user, blog, users)}>
                 delete
               </button>
             )}{' '}
@@ -86,6 +85,13 @@ const Blog = () => {
         </div>
       )
     }
+  }
+  const del = async (user, blog, users) => {
+    dispatch(deleteABlog(blog))
+    dispatch(delBlogFromAUser(user, blog, users))
+    console.log(users)
+
+
   }
 
   const addBlog = async blogObject => {

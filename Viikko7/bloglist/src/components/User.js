@@ -11,7 +11,6 @@ const User = users => {
 
   return (
     <div>
-        {console.log(user)}
       <h3>{user.username}</h3>
       <b>added blogs</b>
       {user.blogs.map(b =>

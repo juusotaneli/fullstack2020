@@ -13,14 +13,15 @@ import {
 } from './reducers/notificationReducer'
 import { initializeBlogs } from './reducers/blogReducer'
 import { initializeUser, logoutUser } from './reducers/userReducer'
+import { initializeUsers } from './reducers/usersReducer'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 
 const App = () => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
+  const users = useSelector(state => state.users)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [users, setUsers] = useState('')
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInUser')
@@ -31,20 +32,16 @@ const App = () => {
   }, [dispatch])
 
   useEffect(() => {
-    blogService.getAll().then(blogs => dispatch(initializeBlogs(blogs)))
+    dispatch(initializeUsers())
   }, [dispatch])
 
   useEffect(() => {
-    const u = async () => {
-      try {
-        const res = await userService.getAll()
-        setUsers(res)
-      } catch (error) {
-        console.log('error')
-      }
+    const loggedUserJSON = window.localStorage.getItem('loggedInUser')
+    if (loggedUserJSON) {
+      dispatch(initializeBlogs())
     }
-    u()
-  }, [users])
+  }, [dispatch])
+
 
   const handleLogin = async event => {
     event.preventDefault()
@@ -121,9 +118,10 @@ const App = () => {
       <Switch>
         <Route path='/blogs'>{user !== null && <Blog />}</Route>
         <Route path='/users/:id'>
-          {users.length > 0 && <User users={users}/>}
+          {console.log(users)}
+          {users && <User users={users}/>}
         </Route>
-        <Route path='/users'>{users !== null && users.length > 0 && <Users users={users} />}</Route>
+        <Route path='/users'>{users && <Users users={users} />}</Route>
         <Route path='/'>
           {user !== null && <p>HELLO WELCOME MY FRIEND</p>}
         </Route>

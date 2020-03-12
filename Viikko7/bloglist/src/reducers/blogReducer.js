@@ -20,6 +20,7 @@ const reducer = (state = [], action) => {
   case 'NEW_BLOG':
     return [...state, action.data]
   case 'DELETE_BLOG':
+    console.log(action.data.id)
     return state.filter(b => b.id !== action.data.id)
   case 'INIT_BLOGS':
     return action.data
@@ -61,7 +62,7 @@ export const addLikeToABlog = blog => {
   }
 }
 
-export const createNewBlog = blogObject => {
+export const createNewBlog = (blogObject) => {
   return async dispatch => {
     const newBlog = await blogService.create({
       title: blogObject.title,

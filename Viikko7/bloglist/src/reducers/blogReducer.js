@@ -61,7 +61,7 @@ export const addLikeToABlog = blog => {
   }
 }
 
-export const createNewBlog = (blogObject) => {
+export const createNewBlog = blogObject => {
   return async dispatch => {
     const newBlog = await blogService.create({
       title: blogObject.title,

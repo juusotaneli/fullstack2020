@@ -59,7 +59,7 @@ blogsRouter.delete('/api/blogs/:id', async (request, response) => {
 
     if (String(decodedToken.id) === String(blog.user._id)) {
         await Blog.findByIdAndDelete(blog.id)
-        user.blogs = user.blogs.filter(b => b.id.toString() !== request.params.id.toString())
+        user.blogs = user.blogs.filter(b => String(b._id) !== request.params.id)
         await user.save()
         response.status(200).end()
     } else {

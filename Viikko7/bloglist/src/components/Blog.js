@@ -14,17 +14,11 @@ import {
   deleteABlog,
   handleToggleVisibility
 } from '../reducers/blogReducer'
-import {
-  addBlogToAUser,
-  delBlogFromAUser,
-} from '../reducers/usersReducer'
 
 const Blog = () => {
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
   const username = useSelector(state => state.user.username)
-  const user = useSelector(state => state.user)
-  const users = useSelector(state => state.users)
 
   const blogFormRef = React.createRef()
 
@@ -76,7 +70,7 @@ const Blog = () => {
           <div>added by {blog.user.username} </div>
           <div>
             {username === blog.user.username && (
-              <button onClick={() => del(user, blog, users)}>
+              <button onClick={() => dispatch(deleteABlog(blog))}>
                 delete
               </button>
             )}{' '}
@@ -86,20 +80,12 @@ const Blog = () => {
       )
     }
   }
-  const del = async (user, blog, users) => {
-    dispatch(deleteABlog(blog))
-    dispatch(delBlogFromAUser(user, blog, users))
-    console.log(users)
-
-
-  }
 
   const addBlog = async blogObject => {
     console.log(username)
     blogFormRef.current.toggleVisibility()
     try {
       dispatch(createNewBlog(blogObject))
-      dispatch(addBlogToAUser( user, blogObject, users))
       dispatch(
         setNotificationWhenNewBlogAdded(
           `a new blog ${blogObject.title} by ${blogObject.author} was added`,

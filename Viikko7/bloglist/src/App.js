@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import Container from '@material-ui/core/Container'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import userService from './services/users'
@@ -23,6 +24,10 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [users, setUsers] = useState('')
+
+  const linkStyle = {
+    paddingRight: 5,
+  }
 
   useEffect(() => {
     const u = async () => {
@@ -107,31 +112,36 @@ const App = () => {
     </p>
   )
   return (
-    <Router>
-      <h2>Blogs</h2>
-      <div>
-        <Link to='/'>home</Link>
-        <Link to='/blogs'>blogs</Link>
-        <Link to='/users'>users</Link>
-      </div>
-
-      <div>
-        {user !== null && showLoggedInUser()}
-        <Notification />
-        {user === null && loginForm()}
-      </div>
-      <Switch>
-        <Route path='/blogs/:id'>{user !== null && <Blog blogs={blogs} />}</Route>
-        <Route path='/blogs'>{user !== null && <Blogs />}</Route>
-        <Route path='/users/:id'>
-          {users.length > 0 && <User users={users}/>}
-        </Route>
-        <Route path='/users'>{user && users.length > 0 && <Users users={users} />}</Route>
-        <Route path='/'>
-          {user !== null && <p>HELLO WELCOME MY FRIEND</p>}
-        </Route>
-      </Switch>
-    </Router>
+    <Container>
+      <Router>
+        <h2>Blogs</h2>
+        <div>
+          <Link style={linkStyle} to='/'>home</Link>
+          <Link style={linkStyle} to='/blogs'>blogs</Link>
+          <Link style={linkStyle} to='/users'>users</Link>
+          {user !== null && showLoggedInUser()}
+        </div>
+        <div>
+          <Notification />
+          {user === null && loginForm()}
+        </div>
+        <Switch>
+          <Route path='/blogs/:id'>
+            {user !== null && <Blog blogs={blogs} />}
+          </Route>
+          <Route path='/blogs'>{user !== null && <Blogs />}</Route>
+          <Route path='/users/:id'>
+            {users.length > 0 && <User users={users} />}
+          </Route>
+          <Route path='/users'>
+            {user && users.length > 0 && <Users users={users} />}
+          </Route>
+          <Route path='/'>
+            {user !== null && <p>HELLO WELCOME MY FRIEND</p>}
+          </Route>
+        </Switch>
+      </Router>
+    </Container>
   )
 }
 

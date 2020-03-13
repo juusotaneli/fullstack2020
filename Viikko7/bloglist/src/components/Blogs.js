@@ -3,6 +3,14 @@ import Togglable from './Togglable'
 import BlogForm from './BlogForm'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+} from '@material-ui/core'
 
 import {
   setNotificationWhenNewBlogAdded,
@@ -28,14 +36,31 @@ const Blogs = () => {
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
-    marginBottom: 5,
+    marginBottom: 5
   }
 
   const showBlogs = () => {
-    return blogs
-      .sort((b1, b2) => b2.likes - b1.likes)
-      .map(b => <div style ={blogStyle} key ={b.author}><Link to={`/blogs/${b.id}`}>{b.title}</Link></div> )
+    return (
+      <div>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              {blogs
+                .sort((b1, b2) => b2.likes - b1.likes)
+                .map(b => (
+                  <TableRow key={b.author}>
+                    <TableCell>
+                      <Link to={`/blogs/${b.id}`}>{b.title}</Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+    )
   }
+
   const contentVisibility = blog => {
     if (blog.visible === false) {
       return (

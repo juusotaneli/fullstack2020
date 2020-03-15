@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { gql, useQuery, useMutation } from '@apollo/client'
+import Select from 'react-select'
 
 const ALL_AUTHORS = gql`
   query {
@@ -12,13 +13,12 @@ const ALL_AUTHORS = gql`
 `
 
 const UPDATE_AUTHOR = gql`
-mutation editAuthor($name: String!, $born: Int!) {
-    editAuthor(name: $name, setBornTo: $born)  {
+  mutation editAuthor($name: String!, $born: Int!) {
+    editAuthor(name: $name, setBornTo: $born) {
       name
       born
     }
   }
-
 `
 const Authors = props => {
   const result = useQuery(ALL_AUTHORS, {
@@ -27,7 +27,8 @@ const Authors = props => {
   const [authors, setAuthors] = useState(null)
   const [name, setName] = useState('')
   const [b, setBorn] = useState('')
-  const [ updateAuthor ] = useMutation(UPDATE_AUTHOR)
+  const [options, setOptions] = useState(['kusi', 'paske'])
+  const [updateAuthor] = useMutation(UPDATE_AUTHOR)
 
   const submit = async event => {
     event.preventDefault()
@@ -40,13 +41,16 @@ const Authors = props => {
   useEffect(() => {
     if (result.data) {
       setAuthors(result.data.allAuthors)
+      setOptions(
+        result.data.allAuthors.map(a => ({ value: a.name, label: a.name }))
+      )
     }
   }, [result])
-
   if (!props.show) {
     return null
   }
   if (authors) {
+    console.log(options)
     return (
       <div>
         <h2>authors</h2>
@@ -67,26 +71,27 @@ const Authors = props => {
           </tbody>
         </table>
         <div>
-        <h1>SET BIRTHYEAR</h1>
-        <form onSubmit={submit}>
-        <div>
-          name
-          <input
-            value={name}
-            onChange={({ target }) => setName(target.value)}
-          />
-        </div>
-        <div>
-          born year
-          <input
-            value={b}
-            onChange={({ target }) => setBorn(target.value)}
-          />
-        </div>
-        <button type='submit'>UPDATE AUTHOR</button>
-      </form>
-      </div>
+          <h1>SET BIRTHYEAR</h1>
 
+          <form onSubmit={submit}>
+            <div>
+              select name
+              <Select
+                value={{ value: name, label: name }}
+                options={options}
+                onChange={value => setName(value.value)}
+              />
+            </div>
+            <div>
+              born year
+              <input
+                value={b}
+                onChange={({ target }) => setBorn(target.value)}
+              />
+            </div>
+            <button type='submit'>UPDATE AUTHOR</button>
+          </form>
+        </div>
       </div>
     )
   }

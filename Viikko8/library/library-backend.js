@@ -5,19 +5,19 @@ const Book = require('./models/book')
 
 mongoose.set('useFindAndModify', false)
 
-const MONGODB_URI = 'mongodb+srv://juuso:esaesa@library-cuozf.mongodb.net/test?retryWrites=true&w=majority'
+const MONGODB_URI =
+  'mongodb+srv://juuso:esaesa@library-cuozf.mongodb.net/test?retryWrites=true&w=majority'
 
 console.log('connecting to', MONGODB_URI)
 
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose
+  .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('connected to MongoDB')
   })
-  .catch((error) => {
+  .catch(error => {
     console.log('error connection to MongoDB:', error.message)
   })
-
-
 
 const typeDefs = gql`
   type Author {
@@ -32,7 +32,7 @@ const typeDefs = gql`
     author: Author!
     genres: [String!]!
     id: ID!
-  }  
+  }
   type Query {
     bookCount: Int!
     authorCount: Int!
@@ -46,6 +46,7 @@ const typeDefs = gql`
       author: String!
       genres: [String!]!
     ): Book
+    editAuthor(name: String!, setBornTo: Int!): Author
   }
 `
 const resolvers = {
@@ -53,14 +54,13 @@ const resolvers = {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-        let books = await Book.find().populate('author')
-        return books
-      
+      let books = await Book.find().populate('author')
+      return books
     },
     allAuthors: async (root, args) => {
       const authors = await Author.find()
       return authors
-    },
+    }
   },
   Mutation: {
     addBook: async (root, args) => {
@@ -79,8 +79,7 @@ const resolvers = {
           })
         }
       }
-
-      let book = new Book ({ ...args, author }) 
+      let book = new Book({ ...args, author })
       try {
         await book.save()
       } catch (error) {
@@ -90,7 +89,21 @@ const resolvers = {
       }
       return await book.save()
     },
-    
+    editAuthor: async (root, args) => {
+      const name = args.name
+      const born = args.setBornTo
+      let author = await Author.findOneAndUpdate(
+        { name },
+        { born },
+        {
+          new: true
+        }
+      )
+      if (!author) {
+        return null
+      }
+      return author
+    }
   },
   Author: {
     name: root => root.name,

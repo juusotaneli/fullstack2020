@@ -7,14 +7,16 @@ const ALL_BOOKS = gql`
     allBooks {
       title
       published
-      author
+      author {
+        name
+      }
     }
   }
 `
 
 const Books = (props) => {
   const result = useQuery(ALL_BOOKS, {
-    pollInterval: 1000
+    pollInterval: 5000
   })
   const [books, setBooks] = useState(null)
 
@@ -50,7 +52,7 @@ const Books = (props) => {
           {books.map(a =>
             <tr key={a.title}>
               <td>{a.title}</td>
-              <td>{a.author}</td>
+              <td>{a.author.name}</td>
               <td>{a.published}</td>
             </tr>
           )}

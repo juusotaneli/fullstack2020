@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { gql, useQuery, useMutation } from '@apollo/client'
 import Select from 'react-select'
+import Notification from './Notification'
 
 const ALL_AUTHORS = gql`
   query {
@@ -22,18 +23,26 @@ const UPDATE_AUTHOR = gql`
 `
 const Authors = props => {
   const result = useQuery(ALL_AUTHORS, {
-    pollInterval: 1000
+    pollInterval: 5000
   })
   const [authors, setAuthors] = useState(null)
   const [name, setName] = useState('')
   const [b, setBorn] = useState('')
-  const [options, setOptions] = useState(['kusi', 'paske'])
+  const [options, setOptions] = useState([''])
   const [updateAuthor] = useMutation(UPDATE_AUTHOR)
+  const [notification, setNotification] = useState('')
 
   const submit = async event => {
     event.preventDefault()
     let born = Number(b)
-    updateAuthor({ variables: { name, born } })
+    try {
+      await updateAuthor({ variables: { name, born } })
+    } catch (error) {
+      setNotification(error.message)
+      setTimeout(() => {
+        setNotification('')
+      }, 3000)
+    }
     setName('')
     setBorn('')
   }
@@ -46,14 +55,16 @@ const Authors = props => {
       )
     }
   }, [result])
+
   if (!props.show) {
     return null
   }
+  console.log(result)
   if (authors) {
-    console.log(options)
     return (
       <div>
         <h2>authors</h2>
+        <Notification message={notification} />
         <table>
           <tbody>
             <tr>

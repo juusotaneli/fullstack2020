@@ -3,12 +3,25 @@ import React, { useState } from 'react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
+import NewUser from './components/NewUser'
+import LoginForm from './components/LoginForm'
 
 
 
 const App = () => {
   const [page, setPage] = useState('authors')
+  const [token, setToken] = useState(null)
 
+  if (!token) {
+    return (
+      <div>
+        <h2>Login</h2>
+        <LoginForm
+          setToken={setToken}
+        />
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -16,6 +29,7 @@ const App = () => {
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
         <button onClick={() => setPage('add')}>add book</button>
+        <button onClick={() => setPage('addUser')}>add user</button>
       </div>
 
       <Authors
@@ -28,6 +42,9 @@ const App = () => {
 
       <NewBook
         show={page === 'add'}
+      />
+      <NewUser
+        show={page === 'addUser'}
       />
 
     </div>

@@ -12,7 +12,6 @@ const ALL_AUTHORS = gql`
     }
   }
 `
-
 const UPDATE_AUTHOR = gql`
   mutation editAuthor($name: String!, $born: Int!) {
     editAuthor(name: $name, setBornTo: $born) {
@@ -59,7 +58,6 @@ const Authors = props => {
   if (!props.show) {
     return null
   }
-  console.log(result)
   if (authors) {
     return (
       <div>

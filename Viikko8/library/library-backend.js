@@ -2,6 +2,7 @@ const { ApolloServer, gql, UserInputError, AuthenticationError } = require('apol
 const mongoose = require('mongoose')
 const Author = require('./models/author')
 const Book = require('./models/book')
+const User = require('./models/user')
 const jwt = require('jsonwebtoken')
 
 const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
@@ -59,7 +60,7 @@ const typeDefs = gql`
       genres: [String!]!
     ): Book
     editAuthor(name: String!, setBornTo: Int!): Author
-    createUser(username: String!, favoriteGenre: String!): User
+    createUser(username: String!, password: String!, favoriteGenre: String!): User
     login(username: String!, password: String!): Token
   }
 `
@@ -132,7 +133,7 @@ const resolvers = {
       }
     },
     createUser: (root, args) => {
-      const user = new User({ username: args.username })
+      const user = new User({ username: args.username, password: args.password, favoriteGenre: args.favoriteGenre })
 
       return user.save().catch(error => {
         throw new UserInputError(error.message, {
@@ -151,7 +152,7 @@ const resolvers = {
         username: user.username,
         id: user._id
       }
-
+      let v = { value : jwt.sign(userForToken, JWT_SECRET) }
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     }
   },
@@ -170,6 +171,7 @@ const server = new ApolloServer({
   resolvers,
   context: async ({ req }) => {
     const auth = req ? req.headers.authorization : null
+    console.log("AUTH" + req.headers.authorization )
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
       const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET)
       const currentUser = await User.findById(decodedToken.id)

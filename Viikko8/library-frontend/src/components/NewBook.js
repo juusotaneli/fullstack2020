@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { gql, useMutation } from '@apollo/client'
-import Notification from './Notification'
 
 const ADD_BOOK = gql`
   mutation addBook($title: String!, $author: String!, $published: Int! ,$genres: [String!]!) {
@@ -25,7 +24,7 @@ const NewBook = props => {
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
-  const [notification, setNotification] = useState('')
+
 
   const [ addBook ] = useMutation(ADD_BOOK)
 
@@ -39,16 +38,13 @@ const NewBook = props => {
     try {
       await addBook({  variables: { title, author, published, genres } })
     } catch (error) {
-      setNotification(error.message)
+      props.setNotification(error.message)
       setTimeout(() => {
-        setNotification('')
+        props.setNotification('')
       }, 3000)
       
-  
     }
-
     console.log('add book...')
-
     setTitle('')
     setPublished('')
     setAuhtor('')
@@ -63,7 +59,6 @@ const NewBook = props => {
 
   return (
     <div>
-      <Notification message = {notification} />
       <form onSubmit={submit}>
         <div>
           title

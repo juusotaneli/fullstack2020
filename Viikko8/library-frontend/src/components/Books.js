@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { gql, useQuery } from '@apollo/client'
 
-
 const ALL_BOOKS = gql`
   query {
     allBooks {
@@ -10,15 +9,16 @@ const ALL_BOOKS = gql`
       author {
         name
       }
+      genres
     }
   }
 `
-
-const Books = (props) => {
+const Books = props => {
   const result = useQuery(ALL_BOOKS, {
     pollInterval: 5000
   })
   const [books, setBooks] = useState(null)
+  const [filteredBooks, setFilteredBooks] = useState(null)
 
   useEffect(() => {
     if (result.data) {
@@ -42,24 +42,43 @@ const Books = (props) => {
         <tbody>
           <tr>
             <th></th>
-            <th>
-              author
-            </th>
-            <th>
-              published
-            </th>
+            <th>author</th>
+            <th>published</th>
           </tr>
-          {books.map(a =>
+          {!filteredBooks && books.map(a => (
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
               <td>{a.published}</td>
             </tr>
-          )}
+          ))}
+          {filteredBooks && filteredBooks.map(a => (
+            <tr key={a.title}>
+              <td>{a.title}</td>
+              <td>{a.author.name}</td>
+              <td>{a.published}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
+      {books.map(b =>
+        b.genres.map(g => (
+          <button key={b.title} onClick={() => handleSelectedFilter(books, setFilteredBooks, g)}>
+            {g}
+          </button>
+        ))
+      )}
+      <button onClick={() => handleRemoveFilter(setFilteredBooks)}>show all</button> 
     </div>
   )
 }
+const handleSelectedFilter = (books, setFilteredBooks, g) => {
+  console.log('joo')
+  if (books.length > 0) {
+    const booksReduced = books.filter(b => b.genres.includes(g))
+    setFilteredBooks(booksReduced)
+  }
+}
+const handleRemoveFilter = (setFilteredBooks) => {setFilteredBooks(null)}
 
 export default Books

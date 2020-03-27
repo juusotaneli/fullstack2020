@@ -8,17 +8,18 @@ export const LOGIN = gql`
     }
   }
 `
-const LoginForm = ({ setToken, setNotification }) => {
+
+const LoginForm = ({ setToken, setNotification, setUser }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-
   const [login, result] = useMutation(LOGIN, {
     onError: error => {
       setNotification(error.graphQLErrors[0].message)
       setTimeout(() => {
         setNotification('')
       }, 3000)
-    }
+    },
+    options: { fetchPolicy: 'no-cache' }
   })
 
   useEffect(() => {

@@ -18,6 +18,7 @@ const Books = props => {
     pollInterval: 5000
   })
   const [books, setBooks] = useState(null)
+  const [genres, setGenres] = useState(null)
   const [filteredBooks, setFilteredBooks] = useState(null)
 
   useEffect(() => {
@@ -45,40 +46,55 @@ const Books = props => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {!filteredBooks && books.map(a => (
-            <tr key={a.title}>
-              <td>{a.title}</td>
-              <td>{a.author.name}</td>
-              <td>{a.published}</td>
-            </tr>
-          ))}
-          {filteredBooks && filteredBooks.map(a => (
-            <tr key={a.title}>
-              <td>{a.title}</td>
-              <td>{a.author.name}</td>
-              <td>{a.published}</td>
-            </tr>
-          ))}
+          {!filteredBooks &&
+            books.map(a => (
+              <tr key={a.title}>
+                <td>{a.title}</td>
+                <td>{a.author.name}</td>
+                <td>{a.published}</td>
+              </tr>
+            ))}
+          {filteredBooks &&
+            filteredBooks.map(a => (
+              <tr key={a.title}>
+                <td>{a.title}</td>
+                <td>{a.author.name}</td>
+                <td>{a.published}</td>
+              </tr>
+            ))}
         </tbody>
       </table>
-      {books.map(b =>
-        b.genres.map(g => (
-          <button key={b.title} onClick={() => handleSelectedFilter(books, setFilteredBooks, g)}>
-            {g}
-          </button>
-        ))
-      )}
-      <button onClick={() => handleRemoveFilter(setFilteredBooks)}>show all</button> 
+      <Cacca books={books} setFilteredBooks={setFilteredBooks}></Cacca>
+      <button onClick={() => handleRemoveFilter(setFilteredBooks)}>
+        show all
+      </button>
     </div>
   )
 }
 const handleSelectedFilter = (books, setFilteredBooks, g) => {
   console.log('joo')
   if (books.length > 0) {
-    const booksReduced = books.filter(b => b.genres.includes(g))
-    setFilteredBooks(booksReduced)
+    const booksFiltered = books.filter(b => b.genres.includes(g))
+    setFilteredBooks(booksFiltered)
   }
 }
-const handleRemoveFilter = (setFilteredBooks) => {setFilteredBooks(null)}
+const handleRemoveFilter = setFilteredBooks => {
+  setFilteredBooks(null)
+}
+
+const Cacca = ({ books }, { setFilteredBooks }) => {
+  let a = new Set()
+  books.forEach(b => b.genres.forEach(g => a.add(g)))
+
+  let array = [...a]
+  return array.map(g => (
+    <button
+      key={g}
+      onClick={() => handleSelectedFilter(books, setFilteredBooks, g)}
+    >
+      {g}
+    </button>
+  ))
+}
 
 export default Books

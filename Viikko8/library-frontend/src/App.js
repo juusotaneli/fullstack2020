@@ -8,14 +8,7 @@ import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Recommendations from './components/Recommendations'
 
-const CURRENT_USER = gql`
-  query {
-    me {
-      username
-      favoriteGenre
-    }
-  }
-`
+
 
 const App = () => {
   
@@ -24,15 +17,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState('')
   const client = useApolloClient()
-  const userQueryResult = useQuery(CURRENT_USER, {
-    options: { fetchPolicy: 'no-cache' },
-  })
-
-  useEffect(() => {
-    if (userQueryResult.data) {
-      console.log(userQueryResult.data)
-    }
-  },[userQueryResult])
+  
 
   const logout = () => {
     setToken(null)
@@ -49,6 +34,7 @@ const App = () => {
         <LoginForm
           setToken={setToken}
           setNotification={setNotification}
+          setUser={setUser}
         />
       </div>
     )

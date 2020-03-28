@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { gql, useQuery } from '@apollo/client'
+import Genres from './Genres'
 
 const ALL_BOOKS = gql`
   query {
@@ -13,13 +14,19 @@ const ALL_BOOKS = gql`
     }
   }
 `
+
 const Books = props => {
   const result = useQuery(ALL_BOOKS, {
     pollInterval: 5000
   })
   const [books, setBooks] = useState(null)
-  const [genres, setGenres] = useState(null)
   const [filteredBooks, setFilteredBooks] = useState(null)
+
+  
+  const handleRemoveFilter = () => {
+    setFilteredBooks(null)
+  }
+  
 
   useEffect(() => {
     if (result.data) {
@@ -64,37 +71,14 @@ const Books = props => {
             ))}
         </tbody>
       </table>
-      <Cacca books={books} setFilteredBooks={setFilteredBooks}></Cacca>
+      <Genres books={books} setFilteredBooks={setFilteredBooks}></Genres>
       <button onClick={() => handleRemoveFilter(setFilteredBooks)}>
         show all
       </button>
     </div>
   )
 }
-const handleSelectedFilter = (books, setFilteredBooks, g) => {
-  console.log('joo')
-  if (books.length > 0) {
-    const booksFiltered = books.filter(b => b.genres.includes(g))
-    setFilteredBooks(booksFiltered)
-  }
-}
-const handleRemoveFilter = setFilteredBooks => {
-  setFilteredBooks(null)
-}
 
-const Cacca = ({ books }, { setFilteredBooks }) => {
-  let a = new Set()
-  books.forEach(b => b.genres.forEach(g => a.add(g)))
 
-  let array = [...a]
-  return array.map(g => (
-    <button
-      key={g}
-      onClick={() => handleSelectedFilter(books, setFilteredBooks, g)}
-    >
-      {g}
-    </button>
-  ))
-}
 
 export default Books

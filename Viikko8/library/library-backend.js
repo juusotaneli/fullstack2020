@@ -6,6 +6,8 @@ const User = require('./models/user')
 const jwt = require('jsonwebtoken')
 
 const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
+const { PubSub } = require('apollo-server')
+const pubsub = new PubSub()
 
 mongoose.set('useFindAndModify', false)
 
@@ -46,11 +48,12 @@ const typeDefs = gql`
     id: ID!
   }
   type Query {
+    me: User
     bookCount: Int!
     authorCount: Int!
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
-    me: User
+    booksByGenre(genre: String): [Book!]!
   }
   type Mutation {
     addBook(
@@ -62,7 +65,11 @@ const typeDefs = gql`
     editAuthor(name: String!, setBornTo: Int!): Author
     createUser(username: String!, password: String!, favoriteGenre: String!): User
     login(username: String!, password: String!): Token
+    findUser(username: String!): User
   }
+  type Subscription {
+    bookAdded: Book!
+  } 
 `
 const resolvers = {
   Query: {
@@ -75,7 +82,12 @@ const resolvers = {
       return Author.find()
     },
     me: (root, args, context) => {
+      console.log("kakka" + context.currentUser)
       return context.currentUser
+    },
+    booksByGenre: async (root, args) => {
+      const books = await Book.find()
+      return books.filter(b => b.genres.includes(args.genre))
     }
   },
   Mutation: {
@@ -107,6 +119,8 @@ const resolvers = {
           invalidArgs: args
         })
       }
+      pubsub.publish('BOOK_ADDED', { bookAdded: book })
+
       return book
     },
     editAuthor: async (root, args, context) => {
@@ -141,20 +155,18 @@ const resolvers = {
         })
       })
     },
-    login: async (root, args) => {
+    login: async (root, args, context) => {
       const user = await User.findOne({ username: args.username })
-
       if (!user || args.password !== 'secret') {
         throw new UserInputError('wrong credentials')
       }
-
       const userForToken = {
         username: user.username,
         id: user._id
       }
-      let v = { value : jwt.sign(userForToken, JWT_SECRET) }
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     }
+
   },
   Author: {
     name: root => root.name,
@@ -163,7 +175,12 @@ const resolvers = {
       const c = a.filter(b => String(b.author) === String(root._id))
       return c.length
     }
-  }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED'])
+    },
+  },
 }
 
 const server = new ApolloServer({
@@ -172,9 +189,10 @@ const server = new ApolloServer({
   context: async ({ req }) => {
     const auth = req ? req.headers.authorization : null
     console.log("AUTH" + req.headers.authorization )
-    if (auth && auth.toLowerCase().startsWith('bearer ')) {
+    if (auth && auth.toLowerCase().startsWith('bearer')) {
       const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET)
       const currentUser = await User.findById(decodedToken.id)
+      console.log("tääääää" + currentUser)
       return { currentUser }
     }
   }

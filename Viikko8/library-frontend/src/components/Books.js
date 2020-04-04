@@ -21,10 +21,12 @@ const Books = props => {
   })
   const [books, setBooks] = useState(null)
   const [filteredBooks, setFilteredBooks] = useState(null)
+  const [genre, setGenre] = useState('showing all')
 
   
   const handleRemoveFilter = () => {
     setFilteredBooks(null)
+    setGenre('showing all')
   }
   
 
@@ -45,7 +47,7 @@ const Books = props => {
   return (
     <div>
       <h2>books</h2>
-
+      <p>showing books in genre <b>{genre}</b></p>
       <table>
         <tbody>
           <tr>
@@ -71,7 +73,7 @@ const Books = props => {
             ))}
         </tbody>
       </table>
-      <Genres books={books} setFilteredBooks={setFilteredBooks}></Genres>
+      <Genres books={books} setFilteredBooks={setFilteredBooks} setGenre={setGenre}></Genres>
       <button onClick={() => handleRemoveFilter(setFilteredBooks)}>
         show all
       </button>

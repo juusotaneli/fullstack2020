@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { useMutation, gql, useQuery } from '@apollo/client'
+import { useMutation, gql } from '@apollo/client'
 
-export const LOGIN = gql`
+const LOGIN = gql`
   mutation login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
       value
     }
   }
 `
-const CURRENT_USER = gql`
-  query {
-    me {
-      username
-      favoriteGenre
-    }
-  }
-`
 
-const LoginForm = ({ setToken, setNotification, setUser }) => {
+
+const LoginForm = ({ setToken, setNotification }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [login, result] = useMutation(LOGIN, {
@@ -29,18 +22,16 @@ const LoginForm = ({ setToken, setNotification, setUser }) => {
     },
     options: { fetchPolicy: 'no-cache' }
   })
-  const userQueryResult = useQuery(CURRENT_USER, {
-    options: { fetchPolicy: 'no-cache' },
-  })
-
+ 
   useEffect(() => {
     if (result.data) {
       const token = result.data.login.value
-      setUser(userQueryResult)
       setToken(token)
       localStorage.setItem('token', token)
     }
   }, [result.data]) // eslint-disable-line
+
+ 
 
   const submit = async event => {
     event.preventDefault()

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useApolloClient, gql, useQuery } from '@apollo/client'
+import { useApolloClient, useLazyQuery, useQuery, gql } from '@apollo/client'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
@@ -8,20 +8,36 @@ import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Recommendations from './components/Recommendations'
 
-
-
+const CURRENT_USER = gql`
+    query {
+      me {
+        username
+        favoriteGenre
+      }
+  }
+`
 const App = () => {
   
   const [page, setPage] = useState('authors')
   const [token, setToken] = useState(null)
+  const result = useQuery(CURRENT_USER, {
+    pollInterval: 500
+  })
   const [user, setUser] = useState(null)
+  const [genre, setGenre] = useState(null)
+
   const [notification, setNotification] = useState('')
   const client = useApolloClient()
-  
+
+  useEffect(() => {
+    if (result.data) {
+      setUser(result.data)
+    }
+  }, [result.data]) // eslint-disable-line
 
   const logout = () => {
-    setToken(null)
     setUser(null)
+    setToken(null)
     localStorage.clear()
     client.resetStore()
 
@@ -34,13 +50,11 @@ const App = () => {
         <LoginForm
           setToken={setToken}
           setNotification={setNotification}
-          setUser={setUser}
         />
       </div>
     )
   }
-
-  if (!token) {
+  if (!user) {
     return (
       <p>loading...</p>
     )
@@ -48,8 +62,9 @@ const App = () => {
  
   return (
     <div>
-      {console.log(token)}
-      {user && <p>logged in as {user.username} </p>}
+      {console.log("this " +token)}
+      {console.log(user)}
+      {user.me && <p>logged in as {user.me.username} </p>}
       <div>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
@@ -64,7 +79,7 @@ const App = () => {
       <Authors show={page === 'authors'} />
 
       <Books show={page === 'books'} />
-      {user && <Recommendations show={page === 'recommendations'} user={user} />}
+      {user.me && <Recommendations show={page === 'recommendations'} user={user.me} />}
 
       <NewBook show={page === 'add'} setNotification={setNotification} />
       <NewUser show={page === 'addUser'} />

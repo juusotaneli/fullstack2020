@@ -9,6 +9,7 @@ const ADD_BOOK = gql`
       published: $published
       genres: $genres
     ) {
+      id
       title
       author {
         name
@@ -18,18 +19,23 @@ const ADD_BOOK = gql`
     }
   }
 `
-const NewBook = props => {
+const NewBook = ({updateCacheWith, setNotification, setPage, show}) => {
   const [title, setTitle] = useState('')
   const [author, setAuhtor] = useState('')
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
+  
 
 
-  const [ addBook ] = useMutation(ADD_BOOK)
+  const [ addBook ] = useMutation(ADD_BOOK, {
+    update: (store, response) => {
+      updateCacheWith(response.data.addBook)
+    }
+  })
 
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
@@ -38,9 +44,9 @@ const NewBook = props => {
     try {
       await addBook({  variables: { title, author, published, genres } })
     } catch (error) {
-      props.setNotification(error.message)
+      setNotification(error.message)
       setTimeout(() => {
-        props.setNotification('')
+        setNotification('')
       }, 3000)
       
     }
@@ -50,6 +56,7 @@ const NewBook = props => {
     setAuhtor('')
     setGenres([])
     setGenre('')
+    setPage('books')
   }
 
   const addGenre = () => {

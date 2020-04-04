@@ -5,6 +5,7 @@ import Genres from './Genres'
 const ALL_BOOKS = gql`
   query {
     allBooks {
+      id
       title
       published
       author {

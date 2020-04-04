@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react'
-import { useApolloClient, useLazyQuery, useQuery, gql } from '@apollo/client'
+import { useApolloClient, useQuery, gql, useSubscription} from '@apollo/client'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
@@ -16,6 +17,33 @@ const CURRENT_USER = gql`
       }
   }
 `
+export const ALL_BOOKS = gql`
+  query {
+    allBooks {
+      id
+      title
+      published
+      author {
+        name
+      }
+      genres
+    }
+  }
+`
+export const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      id
+      title
+      author {
+        name
+      }
+      published
+      genres
+    }
+  }
+`
+
 const App = () => {
   
   const [page, setPage] = useState('authors')
@@ -24,16 +52,38 @@ const App = () => {
     pollInterval: 500
   })
   const [user, setUser] = useState(null)
-  const [genre, setGenre] = useState(null)
 
   const [notification, setNotification] = useState('')
   const client = useApolloClient()
+
 
   useEffect(() => {
     if (result.data) {
       setUser(result.data)
     }
   }, [result.data]) // eslint-disable-line
+
+  const updateCacheWith = (addedBook) => {
+    const includedIn = (set, object) => 
+      set.map(b => b.id).includes(object.id)  
+
+    const dataInStore = client.readQuery({ query: ALL_BOOKS })
+    if (!includedIn(dataInStore.allBooks, addedBook)) {
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: { allBooks : dataInStore.allBooks.concat(addedBook) }
+      })
+      window.alert(addedBook.title + ' was added');
+    }   
+  }
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedBook = subscriptionData.data.bookAdded
+      updateCacheWith(addedBook)
+    }
+  })
+
+  
 
   const logout = () => {
     setUser(null)
@@ -81,7 +131,7 @@ const App = () => {
       <Books show={page === 'books'} />
       {user.me && <Recommendations show={page === 'recommendations'} user={user.me} />}
 
-      <NewBook show={page === 'add'} setNotification={setNotification} />
+      <NewBook show={page === 'add'} setNotification={setNotification} updateCacheWith={updateCacheWith} setPage={setPage}/>
       <NewUser show={page === 'addUser'} />
     </div>
   )

@@ -8,8 +8,6 @@ const LOGIN = gql`
     }
   }
 `
-
-
 const LoginForm = ({ setToken, setNotification }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')

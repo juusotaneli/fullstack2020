@@ -12,6 +12,7 @@ const RECOMMENDED_BOOKS = gql`
 
 const Recommendations = props => {
   const result = useQuery(RECOMMENDED_BOOKS, {
+    pollInterval: 5000,
     variables: { genre: props.user.favoriteGenre },
     refetchQueries: [{ query: RECOMMENDED_BOOKS }]
   })
@@ -23,7 +24,7 @@ const Recommendations = props => {
     if (result.data) {
       setBooks(result.data.booksByGenre)
     }
-  }, [result])
+  }, [result.data])
 
   if (!props.show) {
     return null

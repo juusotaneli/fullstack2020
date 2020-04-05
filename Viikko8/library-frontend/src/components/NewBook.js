@@ -33,8 +33,6 @@ const NewBook = ({updateCacheWith, setNotification, setPage, show}) => {
       updateCacheWith(response.data.addBook)
     }
   })
-
-
   if (!show) {
     return null
   }

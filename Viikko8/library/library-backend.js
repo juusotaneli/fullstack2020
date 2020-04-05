@@ -82,7 +82,6 @@ const resolvers = {
       return Author.find()
     },
     me: (root, args, context) => {
-      console.log("kakka" + context.currentUser)
       return context.currentUser
     },
     booksByGenre: async (root, args) => {
@@ -188,16 +187,15 @@ const server = new ApolloServer({
   resolvers,
   context: async ({ req }) => {
     const auth = req ? req.headers.authorization : null
-    console.log("AUTH" + req.headers.authorization )
     if (auth && auth.toLowerCase().startsWith('bearer')) {
       const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET)
       const currentUser = await User.findById(decodedToken.id)
-      console.log("tääääää" + currentUser)
       return { currentUser }
     }
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })

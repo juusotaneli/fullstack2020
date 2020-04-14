@@ -13,23 +13,21 @@ interface UserFeed {
     exercises: Array<number>;
 }
 
-type Rating = "bad" | "average" | "good"
-
 const parser = (args: Array<string>): UserFeed => {
-    console.log(args)
-    let [, , thirdArgument, ...exercises] = args;
+    console.log(args);
+    const [, , thirdArgument, ...exercises] = args;
     if (exercises.length <= 0) throw new Error('No exercises given');
 
     return {
         target: Number(thirdArgument),
         exercises: exercises.map(e => Number(e))
-    }
-}
+    };
+};
 
 const exerciseCalculator = (target: number, exercises: Array<number>): Result => {
 
     let totalHours = 0;
-    let trainingDays = 0;
+    const trainingDays = exercises.filter(e => e !== 0).length;
     let success = false;
     let rating = 0;
     let ratingDescription = '';
@@ -45,15 +43,15 @@ const exerciseCalculator = (target: number, exercises: Array<number>): Result =>
     }
     if (averagePerDay < target - 0.5) {
         rating = 1;
-        ratingDescription = 'bad'
+        ratingDescription = 'bad';
 
     } else if (averagePerDay >= target - 0.5 && averagePerDay <= target + 0.5) {
         rating = 2;
-        ratingDescription = 'average'
+        ratingDescription = 'average';
 
     } else if (averagePerDay > target + 0.5) {
         rating = 3;
-        ratingDescription = 'good'
+        ratingDescription = 'good';
     }
 
     return {
@@ -65,15 +63,16 @@ const exerciseCalculator = (target: number, exercises: Array<number>): Result =>
         target: target,
         average: averagePerDay
 
-    }
+    };
 
-}
+};
 
 try {
     const { target, exercises } = parser(process.argv);
-    console.log(exerciseCalculator(target, exercises))
+    console.log(exerciseCalculator(target, exercises));
 
 } catch (e) {
     console.log('Error, something bad happened, message: ', e.message);
 
 }
+export default exerciseCalculator;

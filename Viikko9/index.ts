@@ -1,18 +1,20 @@
 import express from 'express';
+import eCalculator from './exerciseCalculator';
 
 const app = express();
+app.use(express.json());
 
 app.get('/hello', (_req, res) => {
     res.send('Hello Full Stack!');
 });
 app.get('/bmi', (req, res) => {
 
-    let w = Number(req.query.weight);
-    let h = Number(req.query.height);
+    const w = Number(req.query.weight);
+    const h = Number(req.query.height);
 
     let bmi = '';
 
-    let result = (w / h / h) * 10000
+    const result = (w / h / h) * 10000;
 
     if (result < 18.5) {
         bmi = "You should eat more (anorectic)";
@@ -25,7 +27,7 @@ app.get('/bmi', (req, res) => {
     if (!w || !h) {
         res.send({
             error: "malformatted parameters"
-        })
+        });
     }
     res.send({
         weight: w,
@@ -33,8 +35,20 @@ app.get('/bmi', (req, res) => {
         bmi: bmi
     });
 });
+app.post('/exercises', (req, res) => {
+    if (!req.body.daily_exercises || !req.body.target) {
+        res.status(400).json({
+            error: "parameters missing"
+        });
+    } else if (req.body.target < 0 || req.body.daily_exercises.filter((e: number) => Number(e) !== Number(e)).length > 0) {
+        res.status(400).json({
+            error: "malformatted parameters"
+        });
 
-
+    } else {
+        res.json(eCalculator(req.body.target, req.body.daily_exercises));
+    }
+});
 
 const PORT = 3003;
 

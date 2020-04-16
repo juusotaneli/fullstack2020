@@ -1,5 +1,5 @@
 import patientData from '../../data/patients.json';
-import { Patient, PatientsWithoutSSN } from '../types';
+import { Patient, PatientsWithoutSSN, NewPatientEntry } from '../types';
 
 const patients: Array<Patient> = patientData;
 
@@ -16,12 +16,17 @@ const getPatientsWithoutSSN = (): PatientsWithoutSSN[] => {
     }));
 };
 
-const addEntry = () => {
-    return null;
+const addPatient = ( entry: NewPatientEntry ): Patient => {
+    const newPatientEntry = {
+        id: Math.random().toString(36).substring(7),
+        ...entry
+    };
+    patients.push(newPatientEntry);
+    return newPatientEntry;
 };
 
 export default {
     getEntries,
-    addEntry,
+    addPatient,
     getPatientsWithoutSSN
 };

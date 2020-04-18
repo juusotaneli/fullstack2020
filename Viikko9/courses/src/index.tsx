@@ -28,8 +28,11 @@ interface CoursePartThree extends CoursePartBase2 {
   name: "Deeper type usage";
   exerciseSubmissionLink: string;
 }
+interface CoursePartFour extends CoursePartBase2 {
+  name: "How to become best TypeScript programmer in the universe";
+}
 
-type CoursePart = CoursePartOne | CoursePartTwo | CoursePartThree;
+type CoursePart = CoursePartOne | CoursePartTwo | CoursePartThree | CoursePartFour;
 
 
 // this is the new coursePart variable
@@ -49,6 +52,11 @@ const courseParts: CoursePart[] = [
     exerciseCount: 14,
     description: "Confusing description",
     exerciseSubmissionLink: "https://fake-exercise-submit.made-up-url.dev"
+  },
+  {
+    name: "How to become best TypeScript programmer in the universe",
+    exerciseCount: 14,
+    description: "yolo"
   }
 ];
 
@@ -77,6 +85,14 @@ const Part = ({ course }: { course: CoursePart }) => {
 
   switch (course.name) {
     case "Fundamentals":
+      return (
+        <div>
+          <b>{course.name}</b>
+          <p>description: {course.description} </p>
+          <p>exercises: {course.exerciseCount}</p>
+        </div>
+      );
+      case "How to become best TypeScript programmer in the universe":
       return (
         <div>
           <b>{course.name}</b>

@@ -1,22 +1,29 @@
 import patientData from '../../data/patients.json';
-import { Patient, PatientsWithoutSSN, NewPatientEntry } from '../types';
+import { Patient, PublicPatient, NewPatientEntry } from '../types';
 
-const patients: Array<Patient> = patientData;
+const patients: Array<PublicPatient> = patientData;
 
-const getEntries = (): Array<Patient> => {
+const patients1: Array<PublicPatient> = patientData;
+
+const getEntries = (): Array<PublicPatient> => {
     return patients;
 };
-const getPatientsWithoutSSN = (): PatientsWithoutSSN[] => {
+const getPublicPatients = (): PublicPatient[] => {
     return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
         id,
         name,
         dateOfBirth,
         gender,
-        occupation
+        occupation,
     }));
 };
 
-const addPatient = ( entry: NewPatientEntry ): Patient => {
+const findById = (id: string): PublicPatient | undefined => {
+    const entry = patients1.find(p => p.id === id);
+    return entry;
+};
+
+const addPatient = (entry: NewPatientEntry): Patient => {
     const newPatientEntry = {
         id: Math.random().toString(36).substring(7),
         ...entry
@@ -28,5 +35,6 @@ const addPatient = ( entry: NewPatientEntry ): Patient => {
 export default {
     getEntries,
     addPatient,
-    getPatientsWithoutSSN
+    getPublicPatients,
+    findById
 };

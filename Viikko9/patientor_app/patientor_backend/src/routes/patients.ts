@@ -19,8 +19,8 @@ router.post('/', (req, res) => {
 
 });
 router.get('/:id', (req, res) => {
-    const p = patientService.findById(req.params.id);
 
+    const p = patientService.findById(req.params.id);
     if (p) {
         res.send(p);
     } else {

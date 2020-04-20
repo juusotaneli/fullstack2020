@@ -3,8 +3,6 @@ import { Patient, PublicPatient, NewPatientEntry } from '../types';
 
 const patients: Array<PublicPatient> = patientData;
 
-const patients1: Array<PublicPatient> = patientData;
-
 const getEntries = (): Array<PublicPatient> => {
     return patients;
 };
@@ -18,9 +16,9 @@ const getPublicPatients = (): PublicPatient[] => {
     }));
 };
 
-const findById = (id: string): PublicPatient | undefined => {
-    const entry = patients1.find(p => p.id === id);
-    return entry;
+const findById = (id: string): Patient | undefined => {
+    const entry = patients.find(p => p.id === id);
+    return {...entry, entries: []};
 };
 
 const addPatient = (entry: NewPatientEntry): Patient => {

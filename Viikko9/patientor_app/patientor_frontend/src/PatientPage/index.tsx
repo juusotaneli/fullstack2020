@@ -2,8 +2,7 @@ import React, { Props } from "react";
 import { Container, Header, Button, List } from "semantic-ui-react";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
-
-
+import { getPatient } from "../state";
 import { useStateValue } from "../state";
 import { useParams, Link } from "react-router-dom";
 import { Patient } from "../types";
@@ -36,7 +35,7 @@ const PatientPage: React.FC = () => {
                     console.error(e);
                 }
             } else {
-                dispatch({ type: "GET_PATIENT", payload: patient });
+                dispatch(getPatient(patient));
             }
         };
         fetchPatientList();
@@ -44,30 +43,22 @@ const PatientPage: React.FC = () => {
 
     if (patient) {
         return (
-
             <div className="App">
                 <Container textAlign="left">
                     <Header as="h3">Patient Page</Header>
                     <List>
                         <List.Item>
                             <List.Content>{patient.name}<Gender gender={patient.gender} /></List.Content>
-                            
                         </List.Item>
                         <List.Item>
                             <List.Content>{patient.ssn}</List.Content>
-
                         </List.Item>
                         <List.Item>
                             <List.Content>{patient.occupation}</List.Content>
-
-
                         </List.Item>
                     </List>
                 </Container>
-
             </div>
-
-
         );
     } else {
         return (

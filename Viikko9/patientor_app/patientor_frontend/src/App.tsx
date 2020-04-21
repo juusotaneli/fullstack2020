@@ -9,6 +9,8 @@ import { Patient } from "./types";
 
 import PatientListPage from "./PatientListPage";
 
+import PatientPage from "./PatientPage";
+
 const App: React.FC = () => {
   const [, dispatch] = useStateValue();
   React.useEffect(() => {
@@ -20,6 +22,7 @@ const App: React.FC = () => {
           `${apiBaseUrl}/patients`
         );
         dispatch({ type: "SET_PATIENT_LIST", payload: patientListFromApi });
+        
       } catch (e) {
         console.error(e);
       }
@@ -37,6 +40,7 @@ const App: React.FC = () => {
           </Button>
           <Divider hidden />
           <Switch>
+            <Route path="/patients/:id" render={() => <PatientPage />} />
             <Route path="/" render={() => <PatientListPage />} />
           </Switch>
         </Container>

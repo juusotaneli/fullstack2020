@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, List, Card } from "semantic-ui-react";
+import { Container, List, Card, Header, Icon } from "semantic-ui-react";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
 import { getPatient, getDiagnoses } from "../state";
@@ -25,15 +25,65 @@ const Gender: React.FC<GenderProps> = (props) => {
 };
 const Entries: React.FC<{ entries: Entry[]; diagnoses: Diagnose[] | undefined }> = ({ entries, diagnoses }) => {
     return (
-        <Card>{entries.map(e => <Card.Content key={e.id}>  <Card.Header>{e.date} </Card.Header> <Card.Meta as="i">
-            {e.description}</Card.Meta> <List bulleted> <Diagnoses key={e.description} codes={e.diagnosisCodes} diagnoses={diagnoses} /></List>
-        </Card.Content>)}</Card>
+        <>{entries.map(e =>
+            <Card fluid key={e.id}>
+                <EntryDetails entry={e} diagnoses={diagnoses} />
+            </Card>)}
+        </>
     );
 };
+const EntryDetails: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined }> = ({ entry, diagnoses }) => {
+    switch (entry.type) {
+        case ("Hospital"):
+            return <HospitalEntry entry={entry} diagnoses={diagnoses} icon = 'ambulance'/>;
+        case ("OccupationalHealthcare"):
+            return <OccupationalHealthcare entry={entry} diagnoses={diagnoses} icon = 'user md'/>;
+        case ("HealthCheck"):
+            return <HealthCheck entry={entry} diagnoses={diagnoses} icon = 'heartbeat'/>;
+        default:
+            return <></>;
+    }
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const HealthCheck: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined; icon: any }> = ({ entry, diagnoses, icon }) => {
+    return (
+        <EntryContent entry={entry} diagnoses={diagnoses} icon={icon}/>
+    );
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const OccupationalHealthcare: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined; icon: any }> = ({ entry, diagnoses, icon }) => {
+    return (
+        <EntryContent entry={entry} diagnoses={diagnoses} icon={icon}/>
+    );
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const HospitalEntry: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined; icon: any }> = ({ entry, diagnoses, icon }) => {
+    return (
+        <EntryContent entry={entry} diagnoses={diagnoses} icon={icon} />
+    );
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const EntryContent: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined; icon: any}> = ({ entry, diagnoses, icon }) => {
+    return (
+        
+        <>
+            {console.log(icon)}
+            <Card.Content>
+                <Card.Header>{entry.date}  <Icon fitted name={icon}/></Card.Header> 
+                <Card.Meta as="i"> {entry.description}</Card.Meta>
+                <List bulleted>
+                    <Diagnoses key={entry.description} codes={entry.diagnosisCodes} diagnoses={diagnoses} />
+                </List>
+            </Card.Content>
+        </>
+    );
+};
+
 const Diagnoses: React.FC<{ codes: string[] | undefined; diagnoses: Diagnose[] | undefined }> = ({ codes, diagnoses }) => {
     return (
         <>
-        {codes?.map(c => <List.Item key={c}>{c}  {diagnoses?.find(d => d.code === c)?.name}</List.Item>)}
+            {codes?.map(c => <List.Item key={c}>{c}  {diagnoses?.find(d => d.code === c)?.name}</List.Item>)}
         </>
     );
 };
@@ -95,13 +145,9 @@ const PatientPage: React.FC = () => {
                         <List.Item>
                             <List.Content>{''}</List.Content>
                         </List.Item>
-                        <List.Item>
-                            <List.Content as="h3">entries</List.Content>
-                        </List.Item>
-                        <List.Item>
-                            <Entries key={patient.name} entries={patient.entries} diagnoses={diagnoses} />
-                        </List.Item>
                     </List>
+                    <Header size='medium'>Entries</Header>
+                    <Entries key={patient.name} entries={patient.entries} diagnoses={diagnoses} />
                 </Container>
             </div>
         );

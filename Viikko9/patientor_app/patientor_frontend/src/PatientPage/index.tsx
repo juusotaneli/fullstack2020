@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, List } from "semantic-ui-react";
+import { Container, List, Card } from "semantic-ui-react";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
 import { getPatient, getDiagnoses } from "../state";
@@ -10,34 +10,32 @@ import { Patient, Entry, Diagnose } from "../types";
 interface GenderProps {
     gender: string;
 }
-interface EntryProps {
-    entries: Entry[];
-}
 interface DiagnoseProps {
     codes: string[] | undefined;
     diagnoses: Diagnose[] | undefined;
 }
 const Gender: React.FC<GenderProps> = (props) => {
     if (props.gender === "male") {
-        return <List.Icon name='man' />
+        return <List.Icon name='man' />;
     } else if (props.gender === "female") {
-        return <List.Icon name='woman' />
+        return <List.Icon name='woman' />;
     } else {
-        return <List.Icon name='other gender' />
+        return <List.Icon name='other gender' />;
     }
 };
-const Entries: React.FC<EntryProps> = ({ entries }) => {
+const Entries: React.FC<{ entries: Entry[]; diagnoses: Diagnose[] | undefined }> = ({ entries, diagnoses }) => {
     return (
-        <List.Item>{entries.map(e => <List.Content key={e.id}>{e.date} {e.description}</List.Content>)}</List.Item>
-
-    )
+        <Card>{entries.map(e => <Card.Content key={e.id}>  <Card.Header>{e.date} </Card.Header> <Card.Meta as="i">
+            {e.description}</Card.Meta> <List bulleted> <Diagnoses key={e.description} codes={e.diagnosisCodes} diagnoses={diagnoses} /></List>
+        </Card.Content>)}</Card>
+    );
 };
-const Diagnoses: React.FC<DiagnoseProps> = ({ codes, diagnoses }) => {
+const Diagnoses: React.FC<{ codes: string[] | undefined; diagnoses: Diagnose[] | undefined }> = ({ codes, diagnoses }) => {
     return (
-        <List.Item>{codes?.map(c => <List.Content key={c}>{c}  {diagnoses?.find(d => d.code === c)?.name}</List.Content>)}</List.Item>
-
-    )
-
+        <>
+        {codes?.map(c => <List.Item key={c}>{c}  {diagnoses?.find(d => d.code === c)?.name}</List.Item>)}
+        </>
+    );
 };
 const PatientPage: React.FC = () => {
     const [{ patient, diagnoses }, dispatch] = useStateValue();
@@ -51,7 +49,7 @@ const PatientPage: React.FC = () => {
                         `${apiBaseUrl}/patients/${id}`
                     );
                     dispatch(getPatient(patientListFromApi));
-                    console.log("loaded from api")
+                    console.log("loaded from api");
                 } catch (e) {
                     console.error(e);
                 }
@@ -61,7 +59,7 @@ const PatientPage: React.FC = () => {
         };
         const fetchDiagnoseList = async () => {
             if (diagnoses === undefined) {
-                console.log("joo")
+                console.log("joo");
 
                 try {
                     const { data: diagnoseListFromApi } = await axios.get<Diagnose[]>(
@@ -73,8 +71,8 @@ const PatientPage: React.FC = () => {
                     console.error(e);
                 }
 
-            };
-        }
+            }
+        };
         fetchDiagnoseList();
         fetchPatientList();
     }, [dispatch]);
@@ -101,9 +99,8 @@ const PatientPage: React.FC = () => {
                             <List.Content as="h3">entries</List.Content>
                         </List.Item>
                         <List.Item>
-                            <Entries key={patient.name} entries={patient.entries} />
+                            <Entries key={patient.name} entries={patient.entries} diagnoses={diagnoses} />
                         </List.Item>
-                        {patient.entries.map(e => <Diagnoses key={e.description} codes={e.diagnosisCodes} diagnoses={diagnoses} />)}
                     </List>
                 </Container>
             </div>
@@ -111,7 +108,7 @@ const PatientPage: React.FC = () => {
     } else {
         return (
             <p>loading...</p>
-        )
+        );
     }
 
 };

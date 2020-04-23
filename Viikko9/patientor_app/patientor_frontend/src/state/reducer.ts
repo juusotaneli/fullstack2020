@@ -61,23 +61,23 @@ export const getAllPatients = (data: Patient[]): Action => {
   return {
     type: "SET_PATIENT_LIST",
     payload: data
-  }
-}
+  };
+};
 export const addPatient = (data: Patient): Action => {
   return {
     type: "ADD_PATIENT",
     payload: data
-  }
-}
+  };
+};
 export const getPatient = (data: Patient): Action => {
   return {
     type: "GET_PATIENT",
     payload: data
-  }
-}
+  };
+};
 export const getDiagnoses = (data: Diagnose[]): Action => {
   return {
     type: "GET_DIAGNOSES",
     payload: data
-  }
-}
+  };
+};

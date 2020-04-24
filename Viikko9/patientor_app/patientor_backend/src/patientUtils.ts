@@ -36,9 +36,9 @@ const parseEntries = (entries: any): Entry[] => {
     if (!entries) {
         return [];
     }
-    entries.forEach((entry: any) => {
-        if (!isEntryType(entry)) {
-            throw new Error('Incorrect or missing type: ' + entry);
+    entries.forEach((e: any) => {
+        if (!isEntryType(e)) {
+            throw new Error('Incorrect or missing type: ' + e);
         }
     });
     return entries;
@@ -54,9 +54,4 @@ const toNewPatient = (object: any): NewPatientEntry => {
         entries: parseEntries(object.entries)
     };
 };
-
-
-
-
-
 export default toNewPatient;

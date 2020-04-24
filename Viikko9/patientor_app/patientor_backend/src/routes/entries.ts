@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/:id/entries', (req, res) => {
     try {
         const newEntry = toNewEntry(req.body);
+        console.log(req.body);
         const modifiedPatient = entryService.addEntry(newEntry, req.params.id);
         res.json(modifiedPatient);
 

@@ -2,8 +2,9 @@ import React from "react";
 import { Grid, Button } from "semantic-ui-react";
 import { Field, Formik, Form } from "formik";
 
-import { TextField, SelectField, EntryOption } from "./FormField";
+import { TextField, SelectField, EntryOption, DiagnosisSelection } from "./FormField";
 import { Entry, EntryTypes } from "../types";
+import { useStateValue } from "../state";
 
 /*
  * use type Patient, but omit id and entries,
@@ -23,6 +24,8 @@ const entryOptions: EntryOption[] = [
 ];
 
 export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
+  const [{ diagnoses }] = useStateValue();
+
   return (
     <Formik
       initialValues={{
@@ -30,7 +33,7 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         description: "",
         date: "",
         specialist: "",
-        diagnosisCodes: [],
+        diagnosisCodes: undefined,
         discharge: {date: "" , criteria: ""},
       }}
       
@@ -56,7 +59,7 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         return errors;
       }}
     >
-      {({ isValid, dirty }) => {
+    {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
         return (
           <Form className="form ui">
             <Field
@@ -77,12 +80,11 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
               name="specialist"
               component={TextField}
             />
-            <Field
-              label="Diagnosis codes"
-              placeholder="diagnosis codes"
-              name="diagnosisCodes"
-              component={TextField}
-            />
+            {diagnoses !== undefined && <DiagnosisSelection
+              setFieldValue={setFieldValue}
+              setFieldTouched={setFieldTouched}
+              diagnoses={Object.values(diagnoses)}
+            />} 
             <SelectField
               label="Entry type"
               name="entrytype"

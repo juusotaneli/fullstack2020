@@ -54,7 +54,7 @@ const parseHealthCheckRating = (h: any): HealthCheckRating => {
 
 };
 const parseDiagnoseCodes = (codes: any): string[] => {
-    if (codes) {
+    if (codes.length === 0) {
         return [];
     }
     console.log(diagnoseData.filter(d => String(d.code) === String(codes[0])));

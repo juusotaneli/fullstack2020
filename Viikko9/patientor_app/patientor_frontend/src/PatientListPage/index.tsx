@@ -38,8 +38,6 @@ const PatientListPage: React.FC = () => {
     }
   };
 
-  
-
   return (
     <div className="App">
       <Container textAlign="center">

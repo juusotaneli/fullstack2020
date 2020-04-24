@@ -35,7 +35,7 @@ const parseDate = (date: any): string => {
     return date;
 };
 const parseDischarge = (d: any): Discharge => {
-    if (!d || !isDate(d.date) || !isString(d.criteria)) {
+    if (!isDate(d.date) || !isString(d.criteria)) {
         throw new Error('Incorrect or missing discharge info');
     }
     return d;
@@ -54,11 +54,13 @@ const parseHealthCheckRating = (h: any): HealthCheckRating => {
 
 };
 const parseDiagnoseCodes = (codes: any): string[] => {
-    if (!codes) {
+    if (codes) {
         return [];
     }
+    console.log(diagnoseData.filter(d => String(d.code) === String(codes[0])));
     codes.map((c: { code: any }) => {
         if (diagnoseData.filter(d => String(d.code) === String(c)).length === 0) {
+            console.log();
             throw new Error('Incorrect diagnose code(s)');
         }
 
@@ -77,7 +79,7 @@ const toNewEntry = (e: any): Entry => {
     switch (entry.type) {
         case ("Hospital"):
             return {
-                id: parseString(e.id),
+                id: e.id,
                 description: parseString(e.description),
                 date: parseDate(e.date),
                 specialist: parseString(e.specialist),

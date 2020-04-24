@@ -1,18 +1,23 @@
 import React from "react";
-import { Container, List, Card, Header, Icon } from "semantic-ui-react";
+import { Container, List, Card, Header, Icon, Button } from "semantic-ui-react";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
-import { getPatient, getDiagnoses } from "../state";
+import { getPatient, getDiagnoses, addEntry } from "../state";
+import AddEntryModal from "../AddEntryModal";
+
 import { useStateValue } from "../state";
 import { useParams } from "react-router-dom";
 import { Patient, Entry, Diagnose } from "../types";
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
 
 interface GenderProps {
     gender: string;
 }
-interface DiagnoseProps {
-    codes: string[] | undefined;
+interface ContentProps {
+    entry: Entry;
     diagnoses: Diagnose[] | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    icon: any;
 }
 const Gender: React.FC<GenderProps> = (props) => {
     if (props.gender === "male") {
@@ -26,7 +31,7 @@ const Gender: React.FC<GenderProps> = (props) => {
 const Entries: React.FC<{ entries: Entry[]; diagnoses: Diagnose[] | undefined }> = ({ entries, diagnoses }) => {
     return (
         <>{entries.map(e =>
-            <Card fluid key={e.id}>
+            <Card fluid key={e.date}>
                 <EntryDetails entry={e} diagnoses={diagnoses} />
             </Card>)}
         </>
@@ -35,42 +40,42 @@ const Entries: React.FC<{ entries: Entry[]; diagnoses: Diagnose[] | undefined }>
 const EntryDetails: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined }> = ({ entry, diagnoses }) => {
     switch (entry.type) {
         case ("Hospital"):
-            return <HospitalEntry entry={entry} diagnoses={diagnoses} icon = 'ambulance'/>;
+            return <HospitalEntry entry={entry} diagnoses={diagnoses} icon='ambulance' />;
         case ("OccupationalHealthcare"):
-            return <OccupationalHealthcare entry={entry} diagnoses={diagnoses} icon = 'user md'/>;
+            return <OccupationalHealthcare entry={entry} diagnoses={diagnoses} icon='user md' />;
         case ("HealthCheck"):
-            return <HealthCheck entry={entry} diagnoses={diagnoses} icon = 'heartbeat'/>;
+            return <HealthCheck entry={entry} diagnoses={diagnoses} icon='heartbeat' />;
         default:
             return <></>;
     }
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const HealthCheck: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined; icon: any }> = ({ entry, diagnoses, icon }) => {
+const HealthCheck: React.FC<ContentProps> = ({ entry, diagnoses, icon }) => {
     return (
-        <EntryContent entry={entry} diagnoses={diagnoses} icon={icon}/>
+        <EntryContent entry={entry} diagnoses={diagnoses} icon={icon} />
     );
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const OccupationalHealthcare: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined; icon: any }> = ({ entry, diagnoses, icon }) => {
+const OccupationalHealthcare: React.FC<ContentProps> = ({ entry, diagnoses, icon }) => {
     return (
-        <EntryContent entry={entry} diagnoses={diagnoses} icon={icon}/>
+        <EntryContent entry={entry} diagnoses={diagnoses} icon={icon} />
     );
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const HospitalEntry: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined; icon: any }> = ({ entry, diagnoses, icon }) => {
+const HospitalEntry: React.FC<ContentProps> = ({ entry, diagnoses, icon }) => {
     return (
         <EntryContent entry={entry} diagnoses={diagnoses} icon={icon} />
     );
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const EntryContent: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined; icon: any}> = ({ entry, diagnoses, icon }) => {
+const EntryContent: React.FC<ContentProps> = ({ entry, diagnoses, icon }) => {
     return (
-        
+
         <>
             {console.log(icon)}
             <Card.Content>
-                <Card.Header>{entry.date}  <Icon fitted name={icon}/></Card.Header> 
+                <Card.Header>{entry.date}  <Icon fitted name={icon} /></Card.Header>
                 <Card.Meta as="i"> {entry.description}</Card.Meta>
                 <List bulleted>
                     <Diagnoses key={entry.description} codes={entry.diagnosisCodes} diagnoses={diagnoses} />
@@ -83,14 +88,38 @@ const EntryContent: React.FC<{ entry: Entry; diagnoses: Diagnose[] | undefined; 
 const Diagnoses: React.FC<{ codes: string[] | undefined; diagnoses: Diagnose[] | undefined }> = ({ codes, diagnoses }) => {
     return (
         <>
-            {codes?.map(c => <List.Item key={c}>{c}  {diagnoses?.find(d => d.code === c)?.name}</List.Item>)}
+            {codes?.map(c => <List.Item key={c}>{c} {diagnoses?.find(d => d.code === c)?.name}</List.Item>)}
         </>
     );
 };
 const PatientPage: React.FC = () => {
     const [{ patient, diagnoses }, dispatch] = useStateValue();
-
     const { id } = useParams<{ id: string }>();
+    const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+    const [error, setError] = React.useState<string | undefined>();
+
+    const openModal = (): void => setModalOpen(true);
+
+    const closeModal = (): void => {
+        setModalOpen(false);
+        setError(undefined);
+    };
+
+    const submitNewEntry = async (values: EntryFormValues) => {
+        console.log(values);
+        try {
+            const { data: newEntry } = await axios.post<Patient>(
+                `${apiBaseUrl}/patients/${id}/entries`,
+                values
+            );
+
+            dispatch(addEntry(newEntry));
+            closeModal();
+        } catch (e) {
+            console.error(e.response.data);
+            setError(e.response.data.error);
+        }
+    };
     React.useEffect(() => {
         const fetchPatientList = async () => {
             if (patient?.id !== id) {
@@ -127,14 +156,20 @@ const PatientPage: React.FC = () => {
         fetchPatientList();
     }, [dispatch]);
 
-
     if (patient) {
         return (
             <div className="App">
+                <AddEntryModal
+                    modalOpen={modalOpen}
+                    onSubmit={submitNewEntry}
+                    error={error}
+                    onClose={closeModal}
+                />
                 <Container textAlign="left">
                     <List>
                         <List.Item>
-                            <List.Content as="h2">{patient.name}<Gender gender={patient.gender} /></List.Content>
+                            <List.Content as="h2">{patient.name}<Gender gender={patient.gender} />                 <Button onClick={() => openModal()}>Add New Entry</Button>
+                            </List.Content>
                         </List.Item>
                         <List.Item>
                             <List.Content>{patient.ssn}</List.Content>
